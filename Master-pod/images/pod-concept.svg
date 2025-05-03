@@ -1,0 +1,55 @@
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="500" fill="#f8f9fa" rx="10" ry="10"/>
+  
+  <!-- Title -->
+  <text x="400" y="50" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#326ce5">Kubernetes Pod: The Basic Building Block</text>
+  
+  <!-- Node outline -->
+  <rect x="100" y="100" width="600" height="350" rx="15" ry="15" fill="#f0f4f8" stroke="#546e7a" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="120" y="130" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#546e7a">Kubernetes Node</text>
+  
+  <!-- Pod outline -->
+  <rect x="150" y="150" width="500" height="250" rx="20" ry="20" fill="#ffffff" stroke="#326ce5" stroke-width="3"/>
+  <text x="400" y="180" font-family="Arial, sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="#326ce5">Pod</text>
+  
+  <!-- Pod IP address -->
+  <rect x="320" y="190" width="160" height="30" rx="5" ry="5" fill="#e8f0fe" stroke="#326ce5" stroke-width="1"/>
+  <text x="400" y="210" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#326ce5">IP: 10.244.0.17</text>
+  
+  <!-- Container 1 -->
+  <rect x="200" y="240" width="180" height="120" rx="10" ry="10" fill="#e1f5fe" stroke="#0288d1" stroke-width="2"/>
+  <text x="290" y="265" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#0288d1">Container 1</text>
+  <text x="290" y="290" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#424242">Web Application</text>
+  <text x="290" y="315" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#424242">localhost:8080</text>
+  <rect x="230" y="325" width="120" height="25" rx="5" ry="5" fill="#ffffff" stroke="#0288d1" stroke-width="1"/>
+  <text x="290" y="342" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#0288d1">nginx:1.21</text>
+  
+  <!-- Container 2 -->
+  <rect x="420" y="240" width="180" height="120" rx="10" ry="10" fill="#e8f5e9" stroke="#388e3c" stroke-width="2"/>
+  <text x="510" y="265" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#388e3c">Container 2</text>
+  <text x="510" y="290" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#424242">Log Processor</text>
+  <text x="510" y="315" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#424242">localhost:9000</text>
+  <rect x="450" y="325" width="120" height="25" rx="5" ry="5" fill="#ffffff" stroke="#388e3c" stroke-width="1"/>
+  <text x="510" y="342" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#388e3c">logger:2.3</text>
+  
+  <!-- Shared context -->
+  <path d="M 390,330 C 390,350 410,350 410,330" stroke="#326ce5" stroke-width="2" fill="none"/>
+  <text x="400" y="370" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#326ce5">Shared Network</text>
+  
+  <!-- Characteristics -->
+  <g transform="translate(620, 420)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#326ce5">Key Characteristics:</text>
+    <text x="0" y="20" font-family="Arial, sans-serif" font-size="12" fill="#424242">• Single IP address</text>
+    <text x="0" y="40" font-family="Arial, sans-serif" font-size="12" fill="#424242">• Shared network namespace</text>
+    <text x="0" y="60" font-family="Arial, sans-serif" font-size="12" fill="#424242">• Co-scheduled on same node</text>
+  </g>
+  
+  <!-- Kubernetes logo -->
+  <g transform="translate(130, 410) scale(0.5)">
+    <path d="M 82.4,50.5 C 82.4,67.4 68.8,81.2 51.9,81.2 C 35,81.2 21.4,67.4 21.4,50.5 C 21.4,33.6 35,19.8 51.9,19.8 C 68.8,19.8 82.4,33.6 82.4,50.5 Z" fill="#326ce5"/>
+    <path d="M 51.9,16 C 33.1,16 17.7,31.4 17.7,50.5 C 17.7,69.6 33.1,85 51.9,85 C 70.7,85 86.1,69.6 86.1,50.5 C 86.1,31.4 70.7,16 51.9,16 Z M 51.9,21.6 C 67.5,21.6 80.5,34.6 80.5,50.5 C 80.5,66.4 67.5,79.4 51.9,79.4 C 36.3,79.4 23.3,66.4 23.3,50.5 C 23.3,34.6 36.3,21.6 51.9,21.6 Z" fill="#ffffff"/>
+    <path d="M 65.5,39 L 38.3,39 L 51.9,64.2 Z" fill="#ffffff" stroke="#ffffff" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M 65.5,39 L 51.9,22.8 L 38.3,39 Z" fill="#ffffff" stroke="#ffffff" stroke-width="5" stroke-linejoin="round"/>
+  </g>
+</svg>
