@@ -1,0 +1,112 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f8f9fa" rx="10" ry="10"/>
+  
+  <!-- Title -->
+  <text x="400" y="50" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#326ce5">Pod Best Practices</text>
+  
+  <!-- Best Practice Categories -->
+  
+  <!-- Resource Management -->
+  <g transform="translate(0, 0)">
+    <rect x="100" y="100" width="280" height="200" rx="15" ry="15" fill="#e3f2fd" stroke="#1976d2" stroke-width="2"/>
+    <text x="240" y="130" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#0d47a1">Resource Management</text>
+    
+    <!-- Icon - Gauge -->
+    <circle cx="140" cy="130" r="20" fill="#bbdefb" stroke="#1976d2" stroke-width="1.5"/>
+    <path d="M 140,120 L 140,130 L 150,135" stroke="#1976d2" stroke-width="2" fill="none"/>
+    <circle cx="140" cy="130" r="3" fill="#1976d2"/>
+    
+    <!-- Best Practices -->
+    <rect x="120" y="150" width="240" height="40" rx="5" ry="5" fill="#bbdefb" stroke="#1976d2" stroke-width="1"/>
+    <text x="240" y="174" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#0d47a1">Always set CPU and memory requests</text>
+    
+    <rect x="120" y="200" width="240" height="40" rx="5" ry="5" fill="#bbdefb" stroke="#1976d2" stroke-width="1"/>
+    <text x="240" y="224" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#0d47a1">Define appropriate resource limits</text>
+    
+    <rect x="120" y="250" width="240" height="40" rx="5" ry="5" fill="#bbdefb" stroke="#1976d2" stroke-width="1"/>
+    <text x="240" y="274" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#0d47a1">Set proper QoS class</text>
+  </g>
+  
+  <!-- Health Checks -->
+  <g transform="translate(0, 0)">
+    <rect x="420" y="100" width="280" height="200" rx="15" ry="15" fill="#e8f5e9" stroke="#388e3c" stroke-width="2"/>
+    <text x="560" y="130" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#1b5e20">Health Checks</text>
+    
+    <!-- Icon - Heartbeat -->
+    <circle cx="460" cy="130" r="20" fill="#c8e6c9" stroke="#388e3c" stroke-width="1.5"/>
+    <path d="M 445,130 L 455,130 L 460,115 L 465,145 L 470,130 L 480,130" stroke="#388e3c" stroke-width="2" fill="none"/>
+    
+    <!-- Best Practices -->
+    <rect x="440" y="150" width="240" height="40" rx="5" ry="5" fill="#c8e6c9" stroke="#388e3c" stroke-width="1"/>
+    <text x="560" y="174" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#1b5e20">Configure liveness probes</text>
+    
+    <rect x="440" y="200" width="240" height="40" rx="5" ry="5" fill="#c8e6c9" stroke="#388e3c" stroke-width="1"/>
+    <text x="560" y="224" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#1b5e20">Implement readiness probes</text>
+    
+    <rect x="440" y="250" width="240" height="40" rx="5" ry="5" fill="#c8e6c9" stroke="#388e3c" stroke-width="1"/>
+    <text x="560" y="274" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#1b5e20">Add startup probes for slow services</text>
+  </g>
+  
+  <!-- Security -->
+  <g transform="translate(0, 0)">
+    <rect x="100" y="320" width="280" height="200" rx="15" ry="15" fill="#fff3e0" stroke="#f57c00" stroke-width="2"/>
+    <text x="240" y="350" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#e65100">Security</text>
+    
+    <!-- Icon - Shield -->
+    <circle cx="140" cy="350" r="20" fill="#ffe0b2" stroke="#f57c00" stroke-width="1.5"/>
+    <path d="M 140,335 L 130,340 L 130,355 C 130,360 140,365 140,365 C 140,365 150,360 150,355 L 150,340 Z" stroke="#f57c00" stroke-width="1.5" fill="#ffe0b2"/>
+    
+    <!-- Best Practices -->
+    <rect x="120" y="370" width="240" height="40" rx="5" ry="5" fill="#ffe0b2" stroke="#f57c00" stroke-width="1"/>
+    <text x="240" y="394" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#e65100">Use security contexts</text>
+    
+    <rect x="120" y="420" width="240" height="40" rx="5" ry="5" fill="#ffe0b2" stroke="#f57c00" stroke-width="1"/>
+    <text x="240" y="444" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#e65100">Run containers as non-root users</text>
+    
+    <rect x="120" y="470" width="240" height="40" rx="5" ry="5" fill="#ffe0b2" stroke="#f57c00" stroke-width="1"/>
+    <text x="240" y="494" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#e65100">Use read-only filesystems when possible</text>
+  </g>
+  
+  <!-- Configuration -->
+  <g transform="translate(0, 0)">
+    <rect x="420" y="320" width="280" height="200" rx="15" ry="15" fill="#f3e5f5" stroke="#8e24aa" stroke-width="2"/>
+    <text x="560" y="350" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#4a148c">Configuration</text>
+    
+    <!-- Icon - Cog -->
+    <circle cx="460" cy="350" r="20" fill="#e1bee7" stroke="#8e24aa" stroke-width="1.5"/>
+    <circle cx="460" cy="350" r="7" fill="none" stroke="#8e24aa" stroke-width="1.5"/>
+    <g>
+      <path d="M 460,330 L 460,335" stroke="#8e24aa" stroke-width="2"/>
+      <path d="M 460,365 L 460,370" stroke="#8e24aa" stroke-width="2"/>
+      <path d="M 440,350 L 445,350" stroke="#8e24aa" stroke-width="2"/>
+      <path d="M 475,350 L 480,350" stroke="#8e24aa" stroke-width="2"/>
+      <path d="M 445,335 L 450,340" stroke="#8e24aa" stroke-width="2"/>
+      <path d="M 470,360 L 475,365" stroke="#8e24aa" stroke-width="2"/>
+      <path d="M 445,365 L 450,360" stroke="#8e24aa" stroke-width="2"/>
+      <path d="M 470,340 L 475,335" stroke="#8e24aa" stroke-width="2"/>
+    </g>
+    
+    <!-- Best Practices -->
+    <rect x="440" y="370" width="240" height="40" rx="5" ry="5" fill="#e1bee7" stroke="#8e24aa" stroke-width="1"/>
+    <text x="560" y="394" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#4a148c">Use ConfigMaps for configuration</text>
+    
+    <rect x="440" y="420" width="240" height="40" rx="5" ry="5" fill="#e1bee7" stroke="#8e24aa" stroke-width="1"/>
+    <text x="560" y="444" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#4a148c">Store secrets in Secret objects</text>
+    
+    <rect x="440" y="470" width="240" height="40" rx="5" ry="5" fill="#e1bee7" stroke="#8e24aa" stroke-width="1"/>
+    <text x="560" y="494" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#4a148c">Set appropriate annotations and labels</text>
+  </g>
+  
+  <!-- Kubernetes logo -->
+  <g transform="translate(700, 50) scale(0.25)">
+    <path d="M 82.4,50.5 C 82.4,67.4 68.8,81.2 51.9,81.2 C 35,81.2 21.4,67.4 21.4,50.5 C 21.4,33.6 35,19.8 51.9,19.8 C 68.8,19.8 82.4,33.6 82.4,50.5 Z" fill="#326ce5"/>
+    <path d="M 51.9,16 C 33.1,16 17.7,31.4 17.7,50.5 C 17.7,69.6 33.1,85 51.9,85 C 70.7,85 86.1,69.6 86.1,50.5 C 86.1,31.4 70.7,16 51.9,16 Z M 51.9,21.6 C 67.5,21.6 80.5,34.6 80.5,50.5 C 80.5,66.4 67.5,79.4 51.9,79.4 C 36.3,79.4 23.3,66.4 23.3,50.5 C 23.3,34.6 36.3,21.6 51.9,21.6 Z" fill="#ffffff"/>
+    <path d="M 65.5,39 L 38.3,39 L 51.9,64.2 Z" fill="#ffffff" stroke="#ffffff" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M 65.5,39 L 51.9,22.8 L 38.3,39 Z" fill="#ffffff" stroke="#ffffff" stroke-width="5" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- CKAD Tips Banner -->
+  <rect x="100" y="540" width="600" height="40" rx="5" ry="5" fill="#e8f0fe" stroke="#326ce5" stroke-width="2"/>
+  <text x="400" y="565" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#326ce5">Follow these best practices for CKAD exam success!</text>
+</svg>
