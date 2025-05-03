@@ -1,0 +1,81 @@
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="500" fill="#f8f9fa" rx="10" ry="10"/>
+  
+  <!-- Title -->
+  <text x="400" y="50" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#326ce5">Pod Lifecycle</text>
+  
+  <!-- Lifecycle Flow -->
+  <!-- Phases and their connections -->
+  
+  <!-- Pending Phase -->
+  <rect x="100" y="120" width="150" height="70" rx="15" ry="15" fill="#fff9c4" stroke="#fbc02d" stroke-width="2"/>
+  <text x="175" y="155" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#ff6f00">Pending</text>
+  <text x="175" y="180" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#424242">Pod accepted, not scheduled</text>
+  
+  <!-- Arrow 1 -->
+  <path d="M 250,155 L 320,155" stroke="#78909c" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- Running Phase -->
+  <rect x="320" y="120" width="150" height="70" rx="15" ry="15" fill="#c8e6c9" stroke="#4caf50" stroke-width="2"/>
+  <text x="395" y="155" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#2e7d32">Running</text>
+  <text x="395" y="180" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#424242">Pod bound to node, containers created</text>
+  
+  <!-- Success Path -->
+  <path d="M 470,155 L 540,155" stroke="#78909c" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- Succeeded Phase -->
+  <rect x="540" y="120" width="150" height="70" rx="15" ry="15" fill="#bbdefb" stroke="#2196f3" stroke-width="2"/>
+  <text x="615" y="155" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#0d47a1">Succeeded</text>
+  <text x="615" y="180" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#424242">All containers terminated successfully</text>
+  
+  <!-- Failure Path -->
+  <path d="M 395,190 L 395,255" stroke="#78909c" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- Failed Phase -->
+  <rect x="320" y="255" width="150" height="70" rx="15" ry="15" fill="#ffcdd2" stroke="#e53935" stroke-width="2"/>
+  <text x="395" y="290" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#b71c1c">Failed</text>
+  <text x="395" y="315" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#424242">At least one container terminated in failure</text>
+  
+  <!-- Unknown State Arrow -->
+  <path d="M 225,190 L 225,255 L 320,255" stroke="#78909c" stroke-width="3" fill="none" stroke-dasharray="5,3" marker-end="url(#arrowhead)"/>
+  
+  <!-- Unknown Phase -->
+  <rect x="100" y="255" width="150" height="70" rx="15" ry="15" fill="#e1bee7" stroke="#8e24aa" stroke-width="2"/>
+  <text x="175" y="290" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#4a148c">Unknown</text>
+  <text x="175" y="315" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#424242">Pod state cannot be determined</text>
+  
+  <!-- Container States Section -->
+  <rect x="100" y="360" width="600" height="120" rx="10" ry="10" fill="#f5f5f5" stroke="#9e9e9e" stroke-width="1"/>
+  <text x="150" y="385" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#424242">Container States</text>
+  
+  <!-- Waiting state -->
+  <rect x="130" y="395" width="170" height="70" rx="8" ry="8" fill="#e0f7fa" stroke="#00acc1" stroke-width="1.5"/>
+  <text x="215" y="425" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#006064">Waiting</text>
+  <text x="215" y="445" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#424242">Container is waiting to start</text>
+  
+  <!-- Running state -->
+  <rect x="315" y="395" width="170" height="70" rx="8" ry="8" fill="#e8f5e9" stroke="#43a047" stroke-width="1.5"/>
+  <text x="400" y="425" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#1b5e20">Running</text>
+  <text x="400" y="445" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#424242">Container is executing</text>
+  
+  <!-- Terminated state -->
+  <rect x="500" y="395" width="170" height="70" rx="8" ry="8" fill="#ffebee" stroke="#e53935" stroke-width="1.5"/>
+  <text x="585" y="425" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#b71c1c">Terminated</text>
+  <text x="585" y="445" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#424242">Container has stopped execution</text>
+  
+  <!-- Arrow definitions -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#78909c"/>
+    </marker>
+  </defs>
+  
+  <!-- Kubernetes logo -->
+  <g transform="translate(700, 70) scale(0.25)">
+    <path d="M 82.4,50.5 C 82.4,67.4 68.8,81.2 51.9,81.2 C 35,81.2 21.4,67.4 21.4,50.5 C 21.4,33.6 35,19.8 51.9,19.8 C 68.8,19.8 82.4,33.6 82.4,50.5 Z" fill="#326ce5"/>
+    <path d="M 51.9,16 C 33.1,16 17.7,31.4 17.7,50.5 C 17.7,69.6 33.1,85 51.9,85 C 70.7,85 86.1,69.6 86.1,50.5 C 86.1,31.4 70.7,16 51.9,16 Z M 51.9,21.6 C 67.5,21.6 80.5,34.6 80.5,50.5 C 80.5,66.4 67.5,79.4 51.9,79.4 C 36.3,79.4 23.3,66.4 23.3,50.5 C 23.3,34.6 36.3,21.6 51.9,21.6 Z" fill="#ffffff"/>
+    <path d="M 65.5,39 L 38.3,39 L 51.9,64.2 Z" fill="#ffffff" stroke="#ffffff" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M 65.5,39 L 51.9,22.8 L 38.3,39 Z" fill="#ffffff" stroke="#ffffff" stroke-width="5" stroke-linejoin="round"/>
+  </g>
+</svg>
