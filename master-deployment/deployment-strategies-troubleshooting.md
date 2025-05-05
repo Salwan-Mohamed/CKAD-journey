@@ -6,6 +6,8 @@ This guide covers advanced deployment strategies and troubleshooting techniques 
 
 Beyond the basic RollingUpdate and Recreate strategies, there are several patterns you can implement using Kubernetes resources:
 
+![Deployment Strategies](./images/deployment-strategies.svg)
+
 ### Blue-Green Deployments
 
 Blue-Green deployment involves running two identical environments (blue and green), with only one active at a time. This allows for zero-downtime deployments with immediate rollback capability.
@@ -124,6 +126,8 @@ A/B testing is similar to canary deployments but focuses on testing features rat
 3. Use specialized ingress controllers or service meshes like Istio for traffic splitting
 
 ## Troubleshooting Deployments
+
+![Deployment Troubleshooting](./images/deployment-troubleshooting.svg)
 
 ### Common Deployment Issues
 

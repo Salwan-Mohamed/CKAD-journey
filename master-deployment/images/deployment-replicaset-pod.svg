@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="550" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style type="text/css">
+      text { font-family: Arial, sans-serif; }
+      .title { font-size: 20px; font-weight: bold; }
+      .box { fill: #f0f0f0; stroke: #333; stroke-width: 2; }
+      .dep-box { fill: #e1d5e7; stroke: #9673a6; stroke-width: 2; }
+      .rs-box { fill: #dae8fc; stroke: #6c8ebf; stroke-width: 2; }
+      .pod-box { fill: #d5e8d4; stroke: #82b366; stroke-width: 2; }
+      .container-box { fill: #fff2cc; stroke: #d6b656; stroke-width: 1; }
+      .arrow { fill: none; stroke: #666; stroke-width: 2; marker-end: url(#arrowhead); }
+      .label { font-size: 14px; }
+      .code { font-family: monospace; font-size: 12px; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+    </marker>
+  </defs>
+  
+  <text x="400" y="30" text-anchor="middle" class="title">Kubernetes Deployment Hierarchy</text>
+  
+  <!-- Deployment -->
+  <rect x="100" y="50" width="600" height="480" rx="10" ry="10" class="dep-box"/>
+  <text x="170" y="80" class="label">Deployment</text>
+  
+  <!-- Deployment Properties -->
+  <rect x="120" y="90" width="250" height="120" rx="5" ry="5" fill="white" stroke="#9673a6" stroke-width="1"/>
+  <text x="130" y="110" class="code">apiVersion: apps/v1</text>
+  <text x="130" y="130" class="code">kind: Deployment</text>
+  <text x="130" y="150" class="code">metadata:</text>
+  <text x="140" y="170" class="code">  name: nginx-deployment</text>
+  <text x="130" y="190" class="code">spec:</text>
+  <text x="140" y="210" class="code">  replicas: 3</text>
+  
+  <!-- ReplicaSet 1 - Current -->
+  <rect x="150" y="230" width="500" height="140" rx="10" ry="10" class="rs-box"/>
+  <text x="220" y="255" class="label">ReplicaSet (Current)</text>
+  <text x="220" y="275" class="code">nginx-deployment-75h9p</text>
+  
+  <!-- Pods under Current ReplicaSet -->
+  <rect x="170" y="290" width="100" height="60" rx="5" ry="5" class="pod-box"/>
+  <text x="220" y="310" text-anchor="middle" class="label">Pod 1</text>
+  <rect x="180" y="320" width="80" height="20" rx="2" ry="2" class="container-box"/>
+  <text x="220" y="335" text-anchor="middle" font-size="10">Container</text>
+  
+  <rect x="300" y="290" width="100" height="60" rx="5" ry="5" class="pod-box"/>
+  <text x="350" y="310" text-anchor="middle" class="label">Pod 2</text>
+  <rect x="310" y="320" width="80" height="20" rx="2" ry="2" class="container-box"/>
+  <text x="350" y="335" text-anchor="middle" font-size="10">Container</text>
+  
+  <rect x="430" y="290" width="100" height="60" rx="5" ry="5" class="pod-box"/>
+  <text x="480" y="310" text-anchor="middle" class="label">Pod 3</text>
+  <rect x="440" y="320" width="80" height="20" rx="2" ry="2" class="container-box"/>
+  <text x="480" y="335" text-anchor="middle" font-size="10">Container</text>
+  
+  <!-- ReplicaSet 2 - Old (scaled to 0) -->
+  <rect x="150" y="390" width="500" height="100" rx="10" ry="10" class="rs-box" fill-opacity="0.5"/>
+  <text x="220" y="415" class="label">ReplicaSet (Old)</text>
+  <text x="220" y="435" class="code">nginx-deployment-84jf2</text>
+  <text x="220" y="455" class="code">replicas: 0</text>
+  <text x="220" y="475" class="code">(kept for rollback history)</text>
+  
+  <!-- Arrows -->
+  <line x1="400" y1="230" x2="400" y2="140" class="arrow"/>
+  <line x1="400" y1="390" x2="400" y2="370" class="arrow"/>
+  
+  <!-- Annotations -->
+  <text x="550" y="110" class="label">Manages ReplicaSets</text>
+  <text x="550" y="130" class="label">and handles:</text>
+  <text x="550" y="155" class="label">- Rolling Updates</text>
+  <text x="550" y="175" class="label">- Rollbacks</text>
+  <text x="550" y="195" class="label">- Scaling</text>
+  
+  <!-- Deployment Strategies -->
+  <rect x="500" y="455" width="150" height="60" rx="5" ry="5" fill="white" stroke="#333" stroke-width="1"/>
+  <text x="575" y="475" text-anchor="middle" class="label">Strategies:</text>
+  <text x="575" y="495" text-anchor="middle" class="label">RollingUpdate</text>
+  <text x="575" y="515" text-anchor="middle" class="label">Recreate</text>
+</svg>
