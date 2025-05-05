@@ -14,6 +14,8 @@ A Deployment is a higher-level Kubernetes resource that manages ReplicaSets and 
 - **Scaling** of Pod instances
 - **Rolling updates** and rollbacks
 
+![Kubernetes Deployment Overview](./images/deployment-overview.svg)
+
 Deployments add an abstraction layer over ReplicaSets, making it easier to update applications. In production environments, workloads are rarely deployed directly via ReplicaSets because they lack the functionality necessary for easily updating Pods.
 
 ## Purpose and Functionality
@@ -26,6 +28,8 @@ Deployments excel at managing stateless applications by:
    - **Recreate strategy**: All Pods are replaced at once (downtime)
    - **RollingUpdate strategy**: Pods are gradually replaced (minimal/zero downtime)
 4. **Horizontal scaling**: Deployments allow you to scale your workloads by increasing or decreasing the number of Pod replicas
+
+![Deployment Hierarchy](./images/deployment-replicaset-pod.svg)
 
 ## Defining a Deployment
 
@@ -90,6 +94,8 @@ kubectl create deployment my-app --image=my-app:1.0.0 --dry-run=client -o yaml >
 
 ## Deployment Update Strategies
 
+![Deployment Strategies](./images/deployment-strategies.svg)
+
 ### RollingUpdate Strategy (Default)
 
 The RollingUpdate strategy gradually replaces old Pods with new ones, ensuring application availability during updates. You can configure:
@@ -105,6 +111,8 @@ spec:
       maxUnavailable: 25%
       maxSurge: 25%
 ```
+
+![Rolling Update Process](./images/rolling-update.svg)
 
 ### Recreate Strategy
 
@@ -330,6 +338,12 @@ metadata:
 4. **Practice deployment updates and rollbacks** as these are common exam scenarios
 
 5. **Remember the main differences** between Deployment, StatefulSet, and DaemonSet
+
+## Troubleshooting Deployments
+
+![Deployment Troubleshooting](./images/deployment-troubleshooting.svg)
+
+When facing issues with deployments, refer to the troubleshooting guide in the [Deployment Strategies and Troubleshooting](./deployment-strategies-troubleshooting.md) document for detailed steps and commands.
 
 ## Common Deployment Use Cases
 
