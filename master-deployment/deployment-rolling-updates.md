@@ -8,6 +8,8 @@ Rolling updates allow you to update your application declaratively. When you upd
 
 During a rolling update, the Deployment controller replaces Pods gradually, ensuring your application remains available throughout the update process.
 
+![Rolling Update Process](./images/rolling-update.svg)
+
 ## Rolling Update vs. Recreate Strategy
 
 Kubernetes Deployments support two update strategies:
@@ -16,6 +18,8 @@ Kubernetes Deployments support two update strategies:
 2. **Recreate**: Terminates all existing Pods before creating new ones
 
 The key difference is that RollingUpdate maintains availability during updates, while Recreate causes downtime but ensures no two versions run simultaneously.
+
+![Deployment Strategies Comparison](./images/deployment-strategies.svg)
 
 ## Configuring Rolling Updates
 
@@ -56,6 +60,8 @@ When you update a Deployment, the following process occurs:
 3. The old ReplicaSet is gradually scaled down (limited by maxUnavailable)
 4. Once all new Pods are ready and all old Pods are terminated, the update is complete
 5. Old ReplicaSets are kept (with 0 replicas) for rollback purposes
+
+![Deployment Hierarchy](./images/deployment-replicaset-pod.svg)
 
 ## Controlling the Update Process
 
@@ -214,6 +220,8 @@ If rollouts are taking too long:
 - **Adjust maxSurge and maxUnavailable** for faster updates
 - **Optimize container startup time**
 - **Simplify readiness probe** checks
+
+![Deployment Troubleshooting](./images/deployment-troubleshooting.svg)
 
 ## CKAD Exam Tips for Rolling Updates
 
