@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style type="text/css">
+      text { font-family: Arial, sans-serif; }
+      .title { font-size: 20px; font-weight: bold; }
+      .box { fill: #f0f0f0; stroke: #333; stroke-width: 2; }
+      .blue-box { fill: #d4e5f9; stroke: #3276b1; stroke-width: 2; }
+      .green-box { fill: #d9f2d9; stroke: #5cb85c; stroke-width: 2; }
+      .pod { fill: #d9f2d9; stroke: #5cb85c; stroke-width: 2; }
+      .container { fill: #daeef3; stroke: #0099cc; stroke-width: 1; }
+      .arrow { fill: none; stroke: #666; stroke-width: 2; marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+    </marker>
+  </defs>
+  
+  <text x="400" y="30" text-anchor="middle" class="title">Kubernetes Deployment Architecture</text>
+  
+  <!-- Deployment Box -->
+  <rect x="100" y="60" width="600" height="300" rx="10" ry="10" class="box" opacity="0.8"/>
+  <text x="400" y="85" text-anchor="middle" font-size="18">Deployment</text>
+  
+  <!-- ReplicaSet -->
+  <rect x="150" y="100" width="500" height="240" rx="10" ry="10" class="blue-box" opacity="0.8"/>
+  <text x="400" y="125" text-anchor="middle" font-size="16">ReplicaSet</text>
+  
+  <!-- Pods -->
+  <rect x="180" y="140" width="130" height="180" rx="10" ry="10" class="pod"/>
+  <text x="245" y="165" text-anchor="middle" font-size="14">Pod 1</text>
+  
+  <rect x="335" y="140" width="130" height="180" rx="10" ry="10" class="pod"/>
+  <text x="400" y="165" text-anchor="middle" font-size="14">Pod 2</text>
+  
+  <rect x="490" y="140" width="130" height="180" rx="10" ry="10" class="pod"/>
+  <text x="555" y="165" text-anchor="middle" font-size="14">Pod 3</text>
+  
+  <!-- Containers inside Pods -->
+  <rect x="195" y="180" width="100" height="50" rx="5" ry="5" class="container"/>
+  <text x="245" y="210" text-anchor="middle" font-size="12">Container</text>
+  
+  <rect x="195" y="240" width="100" height="50" rx="5" ry="5" class="container"/>
+  <text x="245" y="270" text-anchor="middle" font-size="12">Container</text>
+  
+  <rect x="350" y="180" width="100" height="50" rx="5" ry="5" class="container"/>
+  <text x="400" y="210" text-anchor="middle" font-size="12">Container</text>
+  
+  <rect x="350" y="240" width="100" height="50" rx="5" ry="5" class="container"/>
+  <text x="400" y="270" text-anchor="middle" font-size="12">Container</text>
+  
+  <rect x="505" y="180" width="100" height="50" rx="5" ry="5" class="container"/>
+  <text x="555" y="210" text-anchor="middle" font-size="12">Container</text>
+  
+  <rect x="505" y="240" width="100" height="50" rx="5" ry="5" class="container"/>
+  <text x="555" y="270" text-anchor="middle" font-size="12">Container</text>
+  
+  <!-- Labels -->
+  <text x="70" y="85" font-size="14" text-anchor="end">apiVersion: apps/v1</text>
+  <text x="70" y="105" font-size="14" text-anchor="end">kind: Deployment</text>
+  <text x="70" y="125" font-size="14" text-anchor="end">metadata: name</text>
+  <text x="70" y="145" font-size="14" text-anchor="end">spec: replicas: 3</text>
+</svg>
