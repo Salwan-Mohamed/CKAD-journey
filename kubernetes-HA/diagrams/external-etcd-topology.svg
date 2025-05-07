@@ -1,0 +1,107 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f8f9fa" rx="10" ry="10"/>
+  
+  <!-- Title -->
+  <text x="400" y="40" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">External etcd Topology</text>
+  
+  <!-- Load Balancer -->
+  <rect x="300" y="80" width="200" height="60" rx="5" ry="5" fill="#6b9bc3" stroke="#2c3e50" stroke-width="2"/>
+  <text x="400" y="118" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="white">Load Balancer</text>
+  
+  <!-- Arrow from Load Balancer to Control Plane Nodes -->
+  <path d="M 400 140 L 400 170" stroke="#2c3e50" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- Control Plane Node 1 -->
+  <rect x="100" y="200" width="160" height="150" rx="5" ry="5" fill="#e2f0d9" stroke="#2c3e50" stroke-width="2"/>
+  <text x="180" y="230" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="bold" fill="#333">Control Plane 1</text>
+  
+  <!-- API Server 1 -->
+  <rect x="120" y="250" width="120" height="40" rx="5" ry="5" fill="#b4c7e7" stroke="#2c3e50" stroke-width="2"/>
+  <text x="180" y="275" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333">API Server</text>
+  
+  <!-- Scheduler/Controller 1 -->
+  <rect x="120" y="300" width="120" height="40" rx="5" ry="5" fill="#c5e0b4" stroke="#2c3e50" stroke-width="2"/>
+  <text x="180" y="315" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#333">Controller</text>
+  <text x="180" y="330" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#333">Scheduler</text>
+  
+  <!-- Control Plane Node 2 -->
+  <rect x="320" y="200" width="160" height="150" rx="5" ry="5" fill="#e2f0d9" stroke="#2c3e50" stroke-width="2"/>
+  <text x="400" y="230" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="bold" fill="#333">Control Plane 2</text>
+  
+  <!-- API Server 2 -->
+  <rect x="340" y="250" width="120" height="40" rx="5" ry="5" fill="#b4c7e7" stroke="#2c3e50" stroke-width="2"/>
+  <text x="400" y="275" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333">API Server</text>
+  
+  <!-- Scheduler/Controller 2 -->
+  <rect x="340" y="300" width="120" height="40" rx="5" ry="5" fill="#c5e0b4" stroke="#2c3e50" stroke-width="2"/>
+  <text x="400" y="315" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#333">Controller</text>
+  <text x="400" y="330" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#333">Scheduler</text>
+  
+  <!-- Control Plane Node 3 -->
+  <rect x="540" y="200" width="160" height="150" rx="5" ry="5" fill="#e2f0d9" stroke="#2c3e50" stroke-width="2"/>
+  <text x="620" y="230" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="bold" fill="#333">Control Plane 3</text>
+  
+  <!-- API Server 3 -->
+  <rect x="560" y="250" width="120" height="40" rx="5" ry="5" fill="#b4c7e7" stroke="#2c3e50" stroke-width="2"/>
+  <text x="620" y="275" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333">API Server</text>
+  
+  <!-- Scheduler/Controller 3 -->
+  <rect x="560" y="300" width="120" height="40" rx="5" ry="5" fill="#c5e0b4" stroke="#2c3e50" stroke-width="2"/>
+  <text x="620" y="315" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#333">Controller</text>
+  <text x="620" y="330" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#333">Scheduler</text>
+  
+  <!-- etcd Servers -->
+  <rect x="100" y="420" width="160" height="80" rx="5" ry="5" fill="#f8cbad" stroke="#2c3e50" stroke-width="2"/>
+  <text x="180" y="450" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="bold" fill="#333">etcd 1</text>
+  <text x="180" y="475" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#333">Dedicated Host</text>
+  
+  <rect x="320" y="420" width="160" height="80" rx="5" ry="5" fill="#f8cbad" stroke="#2c3e50" stroke-width="2"/>
+  <text x="400" y="450" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="bold" fill="#333">etcd 2</text>
+  <text x="400" y="475" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#333">Dedicated Host</text>
+  
+  <rect x="540" y="420" width="160" height="80" rx="5" ry="5" fill="#f8cbad" stroke="#2c3e50" stroke-width="2"/>
+  <text x="620" y="450" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="bold" fill="#333">etcd 3</text>
+  <text x="620" y="475" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#333">Dedicated Host</text>
+  
+  <!-- Connection Between Control Plane and etcd Servers -->
+  <path d="M 180 350 L 180 420" stroke="#2c3e50" stroke-width="2" stroke-dasharray="5,3" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M 400 350 L 400 420" stroke="#2c3e50" stroke-width="2" stroke-dasharray="5,3" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M 620 350 L 620 420" stroke="#2c3e50" stroke-width="2" stroke-dasharray="5,3" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- Cross connections -->
+  <path d="M 180 350 C 180 380, 250 380, 320 420" stroke="#2c3e50" stroke-width="1" stroke-dasharray="5,3" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M 180 350 C 180 380, 350 380, 540 420" stroke="#2c3e50" stroke-width="1" stroke-dasharray="5,3" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M 400 350 C 400 380, 300 380, 260 420" stroke="#2c3e50" stroke-width="1" stroke-dasharray="5,3" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M 400 350 C 400 380, 500 380, 540 420" stroke="#2c3e50" stroke-width="1" stroke-dasharray="5,3" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M 620 350 C 620 380, 500 380, 480 420" stroke="#2c3e50" stroke-width="1" stroke-dasharray="5,3" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M 620 350 C 620 380, 320 380, 260 420" stroke="#2c3e50" stroke-width="1" stroke-dasharray="5,3" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- etcd Replication Arrows -->
+  <path d="M 260 460 L 320 460" stroke="#e67e22" stroke-width="2" stroke-dasharray="5,3" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M 480 460 L 540 460" stroke="#e67e22" stroke-width="2" stroke-dasharray="5,3" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M 620 420 C 650 400, 650 380, 400 380 C 150 380, 150 400, 180 420" stroke="#e67e22" stroke-width="2" stroke-dasharray="5,3" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- Legend -->
+  <rect x="100" y="530" width="20" height="20" rx="3" ry="3" fill="#f8cbad" stroke="#2c3e50" stroke-width="1"/>
+  <text x="130" y="545" font-family="Arial, sans-serif" font-size="14" fill="#333">etcd</text>
+  
+  <rect x="220" y="530" width="20" height="20" rx="3" ry="3" fill="#b4c7e7" stroke="#2c3e50" stroke-width="1"/>
+  <text x="250" y="545" font-family="Arial, sans-serif" font-size="14" fill="#333">API Server</text>
+  
+  <rect x="350" y="530" width="20" height="20" rx="3" ry="3" fill="#c5e0b4" stroke="#2c3e50" stroke-width="1"/>
+  <text x="380" y="545" font-family="Arial, sans-serif" font-size="14" fill="#333">Controllers/Scheduler</text>
+  
+  <line x1="500" y1="540" x2="550" y2="540" stroke="#e67e22" stroke-width="2" stroke-dasharray="5,3"/>
+  <text x="560" y="545" font-family="Arial, sans-serif" font-size="14" fill="#333">etcd Replication</text>
+  
+  <line x1="650" y1="540" x2="675" y2="540" stroke="#2c3e50" stroke-width="2" stroke-dasharray="5,3"/>
+  <text x="685" y="545" font-family="Arial, sans-serif" font-size="14" fill="#333">API Connection</text>
+  
+  <!-- Arrow Definition -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
