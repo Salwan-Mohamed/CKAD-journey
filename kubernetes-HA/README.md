@@ -66,11 +66,11 @@ A highly available Kubernetes control plane typically consists of:
 - Load balancer in front of API servers
 - Replicated etcd (either stacked or external)
 
-![Stacked etcd Topology](./diagrams/stacked-etcd-topology.png)
+![Stacked etcd Topology](https://raw.githubusercontent.com/Salwan-Mohamed/CKAD-journey/main/kubernetes-HA/diagrams/stacked-etcd-topology.svg)
 
 *Stacked topology: etcd members and control plane components run on the same nodes*
 
-![External etcd Topology](./diagrams/external-etcd-topology.png)
+![External etcd Topology](https://raw.githubusercontent.com/Salwan-Mohamed/CKAD-journey/main/kubernetes-HA/diagrams/external-etcd-topology.svg)
 
 *External topology: etcd runs on dedicated hosts*
 
@@ -217,7 +217,7 @@ Essential alerts:
 
 Kubemark is a tool used to simulate large Kubernetes clusters for testing control plane performance without requiring the full resource footprint.
 
-![Kubemark Architecture](./diagrams/kubemark-architecture.png)
+![Kubemark Architecture](https://raw.githubusercontent.com/Salwan-Mohamed/CKAD-journey/main/kubernetes-HA/diagrams/kubemark-architecture.svg)
 
 See the [Kubemark Setup Guide](./examples/kubemark-setup/README.md) for detailed instructions.
 
@@ -230,9 +230,9 @@ Key metrics to track for large clusters:
 - etcd operation latency
 - Controller reconciliation times
 
-![API Call Latencies](./diagrams/api-call-latencies.png)
+![API Call Latencies](https://raw.githubusercontent.com/Salwan-Mohamed/CKAD-journey/main/kubernetes-HA/diagrams/api-call-latencies.svg)
 
-![Pod Startup Latencies](./diagrams/pod-startup-latencies.png)
+![Pod Startup Latencies](https://raw.githubusercontent.com/Salwan-Mohamed/CKAD-journey/main/kubernetes-HA/diagrams/pod-startup-latencies.svg)
 
 ## Disaster Recovery
 
