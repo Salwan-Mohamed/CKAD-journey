@@ -1,0 +1,125 @@
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="500" fill="#f8f9fa" rx="10" ry="10"/>
+  
+  <!-- Title -->
+  <text x="400" y="40" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">API Call Latencies</text>
+  <text x="400" y="70" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" fill="#666">99th Percentile Response Times</text>
+  
+  <!-- Chart Area -->
+  <rect x="100" y="100" width="600" height="300" fill="#fff" stroke="#ccc" stroke-width="1"/>
+  
+  <!-- X-Axis -->
+  <line x1="100" y1="400" x2="700" y2="400" stroke="#333" stroke-width="2"/>
+  <text x="400" y="440" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#333">Cluster Size (Number of Nodes)</text>
+  
+  <!-- X-Axis Ticks and Labels -->
+  <line x1="150" y1="400" x2="150" y2="405" stroke="#333" stroke-width="1"/>
+  <text x="150" y="425" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333">100</text>
+  
+  <line x1="250" y1="400" x2="250" y2="405" stroke="#333" stroke-width="1"/>
+  <text x="250" y="425" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333">500</text>
+  
+  <line x1="350" y1="400" x2="350" y2="405" stroke="#333" stroke-width="1"/>
+  <text x="350" y="425" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333">1000</text>
+  
+  <line x1="450" y1="400" x2="450" y2="405" stroke="#333" stroke-width="1"/>
+  <text x="450" y="425" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333">2000</text>
+  
+  <line x1="550" y1="400" x2="550" y2="405" stroke="#333" stroke-width="1"/>
+  <text x="550" y="425" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333">5000</text>
+  
+  <line x1="650" y1="400" x2="650" y2="405" stroke="#333" stroke-width="1"/>
+  <text x="650" y="425" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333">10000</text>
+  
+  <!-- Y-Axis -->
+  <line x1="100" y1="100" x2="100" y2="400" stroke="#333" stroke-width="2"/>
+  <text x="40" y="250" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#333" transform="rotate(-90, 40, 250)">Latency (ms)</text>
+  
+  <!-- Y-Axis Ticks and Labels -->
+  <line x1="95" y1="350" x2="100" y2="350" stroke="#333" stroke-width="1"/>
+  <text x="85" y="355" font-family="Arial, sans-serif" font-size="14" text-anchor="end" fill="#333">100</text>
+  
+  <line x1="95" y1="300" x2="100" y2="300" stroke="#333" stroke-width="1"/>
+  <text x="85" y="305" font-family="Arial, sans-serif" font-size="14" text-anchor="end" fill="#333">200</text>
+  
+  <line x1="95" y1="250" x2="100" y2="250" stroke="#333" stroke-width="1"/>
+  <text x="85" y="255" font-family="Arial, sans-serif" font-size="14" text-anchor="end" fill="#333">300</text>
+  
+  <line x1="95" y1="200" x2="100" y2="200" stroke="#333" stroke-width="1"/>
+  <text x="85" y="205" font-family="Arial, sans-serif" font-size="14" text-anchor="end" fill="#333">400</text>
+  
+  <line x1="95" y1="150" x2="100" y2="150" stroke="#333" stroke-width="1"/>
+  <text x="85" y="155" font-family="Arial, sans-serif" font-size="14" text-anchor="end" fill="#333">500</text>
+  
+  <line x1="95" y1="100" x2="100" y2="100" stroke="#333" stroke-width="1"/>
+  <text x="85" y="105" font-family="Arial, sans-serif" font-size="14" text-anchor="end" fill="#333">600</text>
+  
+  <!-- Grid Lines -->
+  <line x1="100" y1="350" x2="700" y2="350" stroke="#ddd" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="100" y1="300" x2="700" y2="300" stroke="#ddd" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="100" y1="250" x2="700" y2="250" stroke="#ddd" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="100" y1="200" x2="700" y2="200" stroke="#ddd" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="100" y1="150" x2="700" y2="150" stroke="#ddd" stroke-width="1" stroke-dasharray="5,5"/>
+  
+  <line x1="150" y1="100" x2="150" y2="400" stroke="#ddd" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="250" y1="100" x2="250" y2="400" stroke="#ddd" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="350" y1="100" x2="350" y2="400" stroke="#ddd" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="450" y1="100" x2="450" y2="400" stroke="#ddd" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="550" y1="100" x2="550" y2="400" stroke="#ddd" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="650" y1="100" x2="650" y2="400" stroke="#ddd" stroke-width="1" stroke-dasharray="5,5"/>
+  
+  <!-- Data Lines -->
+  <!-- Line for GET Requests -->
+  <polyline points="150,370 250,360 350,345 450,320 550,280 650,220" fill="none" stroke="#3366cc" stroke-width="3"/>
+  
+  <!-- Line for LIST Requests -->
+  <polyline points="150,360 250,340 350,310 450,270 550,210 650,140" fill="none" stroke="#dc3912" stroke-width="3"/>
+  
+  <!-- Line for CREATE Requests -->
+  <polyline points="150,350 250,330 350,300 450,255 550,200 650,125" fill="none" stroke="#ff9900" stroke-width="3"/>
+  
+  <!-- Threshold Line for 1 second -->
+  <line x1="100" y1="250" x2="700" y2="250" stroke="#ff0000" stroke-width="2" stroke-dasharray="10,5"/>
+  <text x="140" y="240" font-family="Arial, sans-serif" font-size="14" fill="#ff0000">Target Threshold (300ms)</text>
+  
+  <!-- Data Points -->
+  <!-- GET Request Points -->
+  <circle cx="150" cy="370" r="5" fill="#3366cc"/>
+  <circle cx="250" cy="360" r="5" fill="#3366cc"/>
+  <circle cx="350" cy="345" r="5" fill="#3366cc"/>
+  <circle cx="450" cy="320" r="5" fill="#3366cc"/>
+  <circle cx="550" cy="280" r="5" fill="#3366cc"/>
+  <circle cx="650" cy="220" r="5" fill="#3366cc"/>
+  
+  <!-- LIST Request Points -->
+  <circle cx="150" cy="360" r="5" fill="#dc3912"/>
+  <circle cx="250" cy="340" r="5" fill="#dc3912"/>
+  <circle cx="350" cy="310" r="5" fill="#dc3912"/>
+  <circle cx="450" cy="270" r="5" fill="#dc3912"/>
+  <circle cx="550" cy="210" r="5" fill="#dc3912"/>
+  <circle cx="650" cy="140" r="5" fill="#dc3912"/>
+  
+  <!-- CREATE Request Points -->
+  <circle cx="150" cy="350" r="5" fill="#ff9900"/>
+  <circle cx="250" cy="330" r="5" fill="#ff9900"/>
+  <circle cx="350" cy="300" r="5" fill="#ff9900"/>
+  <circle cx="450" cy="255" r="5" fill="#ff9900"/>
+  <circle cx="550" cy="200" r="5" fill="#ff9900"/>
+  <circle cx="650" cy="125" r="5" fill="#ff9900"/>
+  
+  <!-- Legend -->
+  <rect x="500" y="110" width="180" height="80" rx="5" ry="5" fill="white" stroke="#ccc" stroke-width="1"/>
+  
+  <circle cx="520" cy="130" r="5" fill="#3366cc"/>
+  <line x1="530" y1="130" x2="550" y2="130" stroke="#3366cc" stroke-width="3"/>
+  <text x="560" y="135" font-family="Arial, sans-serif" font-size="14" fill="#333">GET Requests</text>
+  
+  <circle cx="520" cy="155" r="5" fill="#dc3912"/>
+  <line x1="530" y1="155" x2="550" y2="155" stroke="#dc3912" stroke-width="3"/>
+  <text x="560" y="160" font-family="Arial, sans-serif" font-size="14" fill="#333">LIST Requests</text>
+  
+  <circle cx="520" cy="180" r="5" fill="#ff9900"/>
+  <line x1="530" y1="180" x2="550" y2="180" stroke="#ff9900" stroke-width="3"/>
+  <text x="560" y="185" font-family="Arial, sans-serif" font-size="14" fill="#333">CREATE Requests</text>
+</svg>

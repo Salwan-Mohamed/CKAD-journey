@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="450" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style type="text/css">
+      text { font-family: Arial, sans-serif; }
+      .title { font-size: 20px; font-weight: bold; }
+      .subtitle { font-size: 16px; }
+      .box { fill: #f0f0f0; stroke: #333; stroke-width: 2; }
+      .blue-box { fill: #d4e5f9; stroke: #3276b1; stroke-width: 2; }
+      .green-box { fill: #d9f2d9; stroke: #5cb85c; stroke-width: 2; }
+      .red-box { fill: #f9d6d5; stroke: #d9534f; stroke-width: 2; }
+      .yellow-box { fill: #ffeeba; stroke: #ffc107; stroke-width: 2; }
+      .arrow { fill: none; stroke: #666; stroke-width: 2; marker-end: url(#arrowhead); }
+      .dashed { stroke-dasharray: 5,5; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+    </marker>
+  </defs>
+  
+  <text x="400" y="30" text-anchor="middle" class="title">Kubernetes Rolling Update Process</text>
+  
+  <!-- Step 1: Initial State -->
+  <rect x="50" y="70" width="650" height="80" rx="10" ry="10" class="box"/>
+  <text x="70" y="95" font-size="14">Step 1: Initial State - All v1 Pods Running</text>
+  
+  <rect x="200" y="90" width="80" height="40" rx="5" ry="5" class="green-box"/>
+  <text x="240" y="115" text-anchor="middle" font-size="12">Pod v1</text>
+  
+  <rect x="300" y="90" width="80" height="40" rx="5" ry="5" class="green-box"/>
+  <text x="340" y="115" text-anchor="middle" font-size="12">Pod v1</text>
+  
+  <rect x="400" y="90" width="80" height="40" rx="5" ry="5" class="green-box"/>
+  <text x="440" y="115" text-anchor="middle" font-size="12">Pod v1</text>
+  
+  <rect x="500" y="90" width="80" height="40" rx="5" ry="5" class="green-box"/>
+  <text x="540" y="115" text-anchor="middle" font-size="12">Pod v1</text>
+  
+  <!-- Step 2: Rolling Update Begins -->
+  <rect x="50" y="170" width="650" height="80" rx="10" ry="10" class="box"/>
+  <text x="70" y="195" font-size="14">Step 2: Rolling Update Begins - First v2 Pod Created</text>
+  
+  <rect x="200" y="190" width="80" height="40" rx="5" ry="5" class="green-box"/>
+  <text x="240" y="215" text-anchor="middle" font-size="12">Pod v1</text>
+  
+  <rect x="300" y="190" width="80" height="40" rx="5" ry="5" class="green-box"/>
+  <text x="340" y="215" text-anchor="middle" font-size="12">Pod v1</text>
+  
+  <rect x="400" y="190" width="80" height="40" rx="5" ry="5" class="green-box"/>
+  <text x="440" y="215" text-anchor="middle" font-size="12">Pod v1</text>
+  
+  <rect x="500" y="190" width="80" height="40" rx="5" ry="5" class="red-box"/>
+  <text x="540" y="215" text-anchor="middle" font-size="12">Pod v1</text>
+  <line x1="500" y1="190" x2="580" y2="230" stroke="#d9534f" stroke-width="2"/>
+  <line x1="500" y1="230" x2="580" y2="190" stroke="#d9534f" stroke-width="2"/>
+  
+  <rect x="600" y="190" width="80" height="40" rx="5" ry="5" class="blue-box"/>
+  <text x="640" y="215" text-anchor="middle" font-size="12">Pod v2</text>
+  
+  <!-- Step 3: Update In Progress -->
+  <rect x="50" y="270" width="650" height="80" rx="10" ry="10" class="box"/>
+  <text x="70" y="295" font-size="14">Step 3: Update In Progress - More v2 Pods Added</text>
+  
+  <rect x="200" y="290" width="80" height="40" rx="5" ry="5" class="green-box"/>
+  <text x="240" y="315" text-anchor="middle" font-size="12">Pod v1</text>
+  
+  <rect x="300" y="290" width="80" height="40" rx="5" ry="5" class="red-box"/>
+  <text x="340" y="315" text-anchor="middle" font-size="12">Pod v1</text>
+  <line x1="300" y1="290" x2="380" y2="330" stroke="#d9534f" stroke-width="2"/>
+  <line x1="300" y1="330" x2="380" y2="290" stroke="#d9534f" stroke-width="2"/>
+  
+  <rect x="400" y="290" width="80" height="40" rx="5" ry="5" class="blue-box"/>
+  <text x="440" y="315" text-anchor="middle" font-size="12">Pod v2</text>
+  
+  <rect x="500" y="290" width="80" height="40" rx="5" ry="5" class="blue-box"/>
+  <text x="540" y="315" text-anchor="middle" font-size="12">Pod v2</text>
+  
+  <!-- Step 4: Final State -->
+  <rect x="50" y="370" width="650" height="80" rx="10" ry="10" class="box"/>
+  <text x="70" y="395" font-size="14">Step 4: Final State - All v2 Pods Running</text>
+  
+  <rect x="200" y="390" width="80" height="40" rx="5" ry="5" class="blue-box"/>
+  <text x="240" y="415" text-anchor="middle" font-size="12">Pod v2</text>
+  
+  <rect x="300" y="390" width="80" height="40" rx="5" ry="5" class="blue-box"/>
+  <text x="340" y="415" text-anchor="middle" font-size="12">Pod v2</text>
+  
+  <rect x="400" y="390" width="80" height="40" rx="5" ry="5" class="blue-box"/>
+  <text x="440" y="415" text-anchor="middle" font-size="12">Pod v2</text>
+  
+  <rect x="500" y="390" width="80" height="40" rx="5" ry="5" class="blue-box"/>
+  <text x="540" y="415" text-anchor="middle" font-size="12">Pod v2</text>
+  
+  <!-- Arrows between steps -->
+  <line x1="400" y1="150" x2="400" y2="170" class="arrow"/>
+  <line x1="400" y1="250" x2="400" y2="270" class="arrow"/>
+  <line x1="400" y1="350" x2="400" y2="370" class="arrow"/>
+  
+  <!-- Labels for maxSurge and maxUnavailable -->
+  <text x="720" y="215" text-anchor="middle" font-size="14">maxSurge = 1</text>
+  <text x="720" y="315" text-anchor="middle" font-size="14">maxUnavailable = 1</text>
+</svg>

@@ -12,7 +12,7 @@ Understanding Kubernetes Pods, the fundamental building blocks of all workloads 
 ### 2. Deployments & ReplicaSets (Coming Soon)
 Managing application deployments, scaling, and updates with higher-level abstractions.
 
-### 3. ConfigMaps & Secrets (Coming Soon)
+### 3. ConfigMaps & Secrets
 Configuring applications and managing sensitive information in Kubernetes.
 
 ### 4. Services & Networking (Coming Soon)

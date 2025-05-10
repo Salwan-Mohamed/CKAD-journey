@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style type="text/css">
+      text { font-family: Arial, sans-serif; }
+      .title { font-size: 20px; font-weight: bold; }
+      .subtitle { font-size: 16px; }
+      .box { fill: #f0f0f0; stroke: #333; stroke-width: 2; }
+      .blue-box { fill: #d4e5f9; stroke: #3276b1; stroke-width: 2; }
+      .green-box { fill: #d9f2d9; stroke: #5cb85c; stroke-width: 2; }
+      .red-box { fill: #f9d6d5; stroke: #d9534f; stroke-width: 2; }
+      .yellow-box { fill: #ffeeba; stroke: #ffc107; stroke-width: 2; }
+      .arrow { fill: none; stroke: #666; stroke-width: 2; marker-end: url(#arrowhead); }
+      .dashed { stroke-dasharray: 5,5; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+    </marker>
+  </defs>
+  
+  <text x="400" y="30" text-anchor="middle" class="title">Kubernetes Deployment Strategies</text>
+  
+  <!-- Rolling Update Strategy -->
+  <rect x="50" y="60" width="700" height="120" rx="10" ry="10" class="box"/>
+  <text x="400" y="85" text-anchor="middle" font-size="16" font-weight="bold">Rolling Update Strategy</text>
+  <text x="400" y="110" text-anchor="middle" font-size="12">Gradually replaces old pods with new ones, ensuring service availability</text>
+  
+  <rect x="100" y="130" width="60" height="30" rx="5" ry="5" class="green-box"/>
+  <text x="130" y="150" text-anchor="middle" font-size="10">v1 Pod</text>
+  
+  <rect x="180" y="130" width="60" height="30" rx="5" ry="5" class="green-box"/>
+  <text x="210" y="150" text-anchor="middle" font-size="10">v1 Pod</text>
+  
+  <rect x="260" y="130" width="60" height="30" rx="5" ry="5" class="red-box"/>
+  <text x="290" y="150" text-anchor="middle" font-size="10">v1 Pod</text>
+  <line x1="260" y1="130" x2="320" y2="160" stroke="#d9534f" stroke-width="1"/>
+  <line x1="260" y1="160" x2="320" y2="130" stroke="#d9534f" stroke-width="1"/>
+  
+  <rect x="340" y="130" width="60" height="30" rx="5" ry="5" class="blue-box"/>
+  <text x="370" y="150" text-anchor="middle" font-size="10">v2 Pod</text>
+  
+  <rect x="420" y="130" width="60" height="30" rx="5" ry="5" class="green-box"/>
+  <text x="450" y="150" text-anchor="middle" font-size="10">v1 Pod</text>
+  
+  <rect x="500" y="130" width="60" height="30" rx="5" ry="5" class="red-box"/>
+  <text x="530" y="150" text-anchor="middle" font-size="10">v1 Pod</text>
+  <line x1="500" y1="130" x2="560" y2="160" stroke="#d9534f" stroke-width="1"/>
+  <line x1="500" y1="160" x2="560" y2="130" stroke="#d9534f" stroke-width="1"/>
+  
+  <rect x="580" y="130" width="60" height="30" rx="5" ry="5" class="blue-box"/>
+  <text x="610" y="150" text-anchor="middle" font-size="10">v2 Pod</text>
+  
+  <!-- Recreate Strategy -->
+  <rect x="50" y="200" width="700" height="120" rx="10" ry="10" class="box"/>
+  <text x="400" y="225" text-anchor="middle" font-size="16" font-weight="bold">Recreate Strategy</text>
+  <text x="400" y="250" text-anchor="middle" font-size="12">Terminates all old pods before creating new ones, causing downtime</text>
+  
+  <g>
+    <rect x="100" y="270" width="60" height="30" rx="5" ry="5" class="green-box"/>
+    <text x="130" y="290" text-anchor="middle" font-size="10">v1 Pod</text>
+    <line x1="100" y1="270" x2="160" y2="300" stroke="#d9534f" stroke-width="1"/>
+    <line x1="100" y1="300" x2="160" y2="270" stroke="#d9534f" stroke-width="1"/>
+  </g>
+  
+  <g>
+    <rect x="180" y="270" width="60" height="30" rx="5" ry="5" class="green-box"/>
+    <text x="210" y="290" text-anchor="middle" font-size="10">v1 Pod</text>
+    <line x1="180" y1="270" x2="240" y2="300" stroke="#d9534f" stroke-width="1"/>
+    <line x1="180" y1="300" x2="240" y2="270" stroke="#d9534f" stroke-width="1"/>
+  </g>
+  
+  <g>
+    <rect x="260" y="270" width="60" height="30" rx="5" ry="5" class="green-box"/>
+    <text x="290" y="290" text-anchor="middle" font-size="10">v1 Pod</text>
+    <line x1="260" y1="270" x2="320" y2="300" stroke="#d9534f" stroke-width="1"/>
+    <line x1="260" y1="300" x2="320" y2="270" stroke="#d9534f" stroke-width="1"/>
+  </g>
+  
+  <text x="400" y="290" text-anchor="middle" font-size="14">Downtime</text>
+  
+  <rect x="500" y="270" width="60" height="30" rx="5" ry="5" class="blue-box"/>
+  <text x="530" y="290" text-anchor="middle" font-size="10">v2 Pod</text>
+  
+  <rect x="580" y="270" width="60" height="30" rx="5" ry="5" class="blue-box"/>
+  <text x="610" y="290" text-anchor="middle" font-size="10">v2 Pod</text>
+  
+  <rect x="660" y="270" width="60" height="30" rx="5" ry="5" class="blue-box"/>
+  <text x="690" y="290" text-anchor="middle" font-size="10">v2 Pod</text>
+  
+  <!-- Blue-Green Strategy -->
+  <rect x="50" y="340" width="700" height="120" rx="10" ry="10" class="box"/>
+  <text x="400" y="365" text-anchor="middle" font-size="16" font-weight="bold">Blue-Green Strategy</text>
+  <text x="400" y="390" text-anchor="middle" font-size="12">Deploys new version alongside old one, then switches traffic when ready</text>
+  
+  <rect x="100" y="410" width="260" height="30" rx="5" ry="5" class="green-box"/>
+  <text x="230" y="430" text-anchor="middle" font-size="10">Blue Environment (v1)</text>
+  
+  <rect x="440" y="410" width="260" height="30" rx="5" ry="5" class="blue-box"/>
+  <text x="570" y="430" text-anchor="middle" font-size="10">Green Environment (v2)</text>
+  
+  <rect x="350" y="440" width="100" height="20" rx="5" ry="5" fill="#f9f9f9" stroke="#333" stroke-width="1"/>
+  <text x="400" y="455" text-anchor="middle" font-size="10">Service / Router</text>
+  
+  <line x1="350" y1="445" x2="230" y2="410" class="arrow"/>
+  <line x1="450" y1="445" x2="570" y2="410" class="arrow dashed"/>
+  
+  <!-- Canary Strategy -->
+  <rect x="50" y="480" width="700" height="100" rx="10" ry="10" class="box"/>
+  <text x="400" y="505" text-anchor="middle" font-size="16" font-weight="bold">Canary Strategy</text>
+  <text x="400" y="530" text-anchor="middle" font-size="12">Routes small percentage of traffic to new version for testing</text>
+  
+  <rect x="100" y="550" width="60" height="25" rx="5" ry="5" class="green-box"/>
+  <text x="130" y="567" text-anchor="middle" font-size="10">v1 Pod</text>
+  
+  <rect x="180" y="550" width="60" height="25" rx="5" ry="5" class="green-box"/>
+  <text x="210" y="567" text-anchor="middle" font-size="10">v1 Pod</text>
+  
+  <rect x="260" y="550" width="60" height="25" rx="5" ry="5" class="green-box"/>
+  <text x="290" y="567" text-anchor="middle" font-size="10">v1 Pod</text>
+  
+  <rect x="340" y="550" width="60" height="25" rx="5" ry="5" class="green-box"/>
+  <text x="370" y="567" text-anchor="middle" font-size="10">v1 Pod</text>
+  
+  <rect x="420" y="550" width="60" height="25" rx="5" ry="5" class="green-box"/>
+  <text x="450" y="567" text-anchor="middle" font-size="10">v1 Pod</text>
+  
+  <rect x="500" y="550" width="60" height="25" rx="5" ry="5" class="blue-box"/>
+  <text x="530" y="567" text-anchor="middle" font-size="10">v2 Pod</text>
+  
+  <text x="600" y="567" text-anchor="middle" font-size="12">10% Traffic</text>
+</svg>
