@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="900" height="500" viewBox="0 0 900 500">
+  <style>
+    .node rect { fill: #fff; stroke: #333; stroke-width: 1.5px; }
+    .node.primary rect { fill: #4e73df; stroke: #333; stroke-width: 2px; }
+    .node.http rect { fill: #1cc88a; stroke: #333; stroke-width: 1px; }
+    .node.tcp rect { fill: #f6c23e; stroke: #333; stroke-width: 1px; }
+    .node.exec rect { fill: #36b9cc; stroke: #333; stroke-width: 1px; }
+    .node text { font-family: Arial; font-size: 14px; fill: #333; }
+    .node.primary text { fill: white; font-weight: bold; }
+    .edgePath path { stroke: #333; stroke-width: 1.5px; fill: none; }
+  </style>
+  <g transform="translate(20,20)">
+    <!-- Main Node -->
+    <g class="node primary" transform="translate(150, 200)">
+      <rect width="160" height="40" rx="5" ry="5"></rect>
+      <text x="80" y="25" text-anchor="middle">Probe Mechanisms</text>
+    </g>
+    
+    <!-- Probe Types -->
+    <g class="node http" transform="translate(420, 100)">
+      <rect width="140" height="40" rx="5" ry="5"></rect>
+      <text x="70" y="25" text-anchor="middle">HTTP GET</text>
+    </g>
+    
+    <g class="node tcp" transform="translate(420, 200)">
+      <rect width="140" height="40" rx="5" ry="5"></rect>
+      <text x="70" y="25" text-anchor="middle">TCP Socket</text>
+    </g>
+    
+    <g class="node exec" transform="translate(420, 300)">
+      <rect width="140" height="40" rx="5" ry="5"></rect>
+      <text x="70" y="25" text-anchor="middle">Exec Command</text>
+    </g>
+    
+    <!-- Description Nodes -->
+    <g transform="translate(620, 100)">
+      <rect width="180" height="50" rx="5" ry="5" fill="#f8f9fc" stroke="#e3e6f0"></rect>
+      <text x="90" y="20" text-anchor="middle" font-size="12px">Sends HTTP GET request</text>
+      <text x="90" y="38" text-anchor="middle" font-size="12px">to container endpoint</text>
+    </g>
+    
+    <g transform="translate(620, 200)">
+      <rect width="180" height="50" rx="5" ry="5" fill="#f8f9fc" stroke="#e3e6f0"></rect>
+      <text x="90" y="20" text-anchor="middle" font-size="12px">Attempts to establish</text>
+      <text x="90" y="38" text-anchor="middle" font-size="12px">TCP connection to port</text>
+    </g>
+    
+    <g transform="translate(620, 300)">
+      <rect width="180" height="50" rx="5" ry="5" fill="#f8f9fc" stroke="#e3e6f0"></rect>
+      <text x="90" y="20" text-anchor="middle" font-size="12px">Executes command</text>
+      <text x="90" y="38" text-anchor="middle" font-size="12px">inside container</text>
+    </g>
+    
+    <!-- Results -->
+    <g transform="translate(460, 160)">
+      <rect width="170" height="30" rx="5" ry="5" fill="#f8f9fc" stroke="#e3e6f0"></rect>
+      <text x="85" y="20" text-anchor="middle" font-size="12px">Success: 200-399 status code</text>
+    </g>
+    
+    <g transform="translate(690, 160)">
+      <rect width="170" height="40" rx="5" ry="5" fill="#f8f9fc" stroke="#e3e6f0"></rect>
+      <text x="85" y="20" text-anchor="middle" font-size="12px">Failure: Other status codes</text>
+      <text x="85" y="35" text-anchor="middle" font-size="12px">or no response</text>
+    </g>
+    
+    <g transform="translate(460, 260)">
+      <rect width="170" height="30" rx="5" ry="5" fill="#f8f9fc" stroke="#e3e6f0"></rect>
+      <text x="85" y="20" text-anchor="middle" font-size="12px">Success: Connection established</text>
+    </g>
+    
+    <g transform="translate(690, 260)">
+      <rect width="170" height="30" rx="5" ry="5" fill="#f8f9fc" stroke="#e3e6f0"></rect>
+      <text x="85" y="20" text-anchor="middle" font-size="12px">Failure: Cannot connect</text>
+    </g>
+    
+    <g transform="translate(460, 360)">
+      <rect width="170" height="30" rx="5" ry="5" fill="#f8f9fc" stroke="#e3e6f0"></rect>
+      <text x="85" y="20" text-anchor="middle" font-size="12px">Success: Exit code 0</text>
+    </g>
+    
+    <g transform="translate(690, 360)">
+      <rect width="170" height="30" rx="5" ry="5" fill="#f8f9fc" stroke="#e3e6f0"></rect>
+      <text x="85" y="20" text-anchor="middle" font-size="12px">Failure: Non-zero exit code</text>
+    </g>
+    
+    <!-- Connecting lines -->
+    <!-- Main to Types -->
+    <path d="M 310,200 L 420,100" class="edgePath" marker-end="url(#arrowhead)"></path>
+    <path d="M 310,220 L 420,220" class="edgePath" marker-end="url(#arrowhead)"></path>
+    <path d="M 310,240 L 420,300" class="edgePath" marker-end="url(#arrowhead)"></path>
+    
+    <!-- Types to Descriptions -->
+    <path d="M 560,120 L 620,120" class="edgePath" marker-end="url(#arrowhead)"></path>
+    <path d="M 560,220 L 620,220" class="edgePath" marker-end="url(#arrowhead)"></path>
+    <path d="M 560,320 L 620,320" class="edgePath" marker-end="url(#arrowhead)"></path>
+    
+    <!-- Descriptions to Results -->
+    <path d="M 620,150 L 600,160" class="edgePath" marker-end="url(#arrowhead)"></path>
+    <path d="M 800,125 L 820,160" class="edgePath" marker-end="url(#arrowhead)"></path>
+    
+    <path d="M 620,250 L 600,260" class="edgePath" marker-end="url(#arrowhead)"></path>
+    <path d="M 800,225 L 820,260" class="edgePath" marker-end="url(#arrowhead)"></path>
+    
+    <path d="M 620,350 L 600,360" class="edgePath" marker-end="url(#arrowhead)"></path>
+    <path d="M 800,325 L 820,360" class="edgePath" marker-end="url(#arrowhead)"></path>
+    
+    <!-- Arrowhead marker definition -->
+    <defs>
+      <marker id="arrowhead" viewBox="0 0 10 10" refX="9" refY="5"
+        markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M 0,0 L 10,5 L 0,10 z" fill="#333"></path>
+      </marker>
+    </defs>
+  </g>
+</svg>
