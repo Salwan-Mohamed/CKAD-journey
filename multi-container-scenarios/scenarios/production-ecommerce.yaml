@@ -1,0 +1,262 @@
+# Scenario: High-Traffic E-commerce Application
+# Pattern: Multiple Sidecars
+# Difficulty: Advanced
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ecommerce-app
+  labels:
+    app: ecommerce
+    tier: frontend
+    version: v2.1
+spec:
+  securityContext:
+    fsGroup: 2000
+    runAsNonRoot: true
+  
+  volumes:
+  - name: app-logs
+    emptyDir:
+      sizeLimit: 2Gi
+  - name: redis-data
+    emptyDir:
+      sizeLimit: 1Gi
+  - name: nginx-config
+    configMap:
+      name: nginx-config
+  - name: filebeat-config
+    configMap:
+      name: filebeat-config
+  - name: tmp-volume
+    emptyDir: {}
+  
+  containers:
+  # Main web application
+  - name: web-app
+    image: ecommerce-web:v2.1
+    ports:
+    - containerPort: 8080
+      name: http
+    env:
+    - name: REDIS_URL
+      value: "redis://localhost:6379"
+    - name: LOG_LEVEL
+      value: "info"
+    - name: NODE_ENV
+      value: "production"
+    - name: DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          name: db-credentials
+          key: url
+    - name: JWT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: app-secrets
+          key: jwt-secret
+    volumeMounts:
+    - name: app-logs
+      mountPath: /var/log/app
+    - name: tmp-volume
+      mountPath: /tmp
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "300m"
+      limits:
+        memory: "1Gi"
+        cpu: "800m"
+    securityContext:
+      runAsUser: 1000
+      runAsGroup: 2000
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 8080
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8080
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      timeoutSeconds: 3
+      failureThreshold: 3
+    startupProbe:
+      httpGet:
+        path: /startup
+        port: 8080
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      timeoutSeconds: 3
+      failureThreshold: 30
+  
+  # Redis cache sidecar
+  - name: redis-cache
+    image: redis:6.2-alpine
+    ports:
+    - containerPort: 6379
+      name: redis
+    volumeMounts:
+    - name: redis-data
+      mountPath: /data
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+      limits:
+        memory: "512Mi"
+        cpu: "200m"
+    securityContext:
+      runAsUser: 999
+      runAsGroup: 999
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+    command: 
+    - redis-server
+    - --maxmemory
+    - 256mb
+    - --maxmemory-policy
+    - allkeys-lru
+    - --save
+    - ""
+    - --appendonly
+    - "no"
+    livenessProbe:
+      exec:
+        command:
+        - redis-cli
+        - ping
+      initialDelaySeconds: 30
+      periodSeconds: 10
+    readinessProbe:
+      exec:
+        command:
+        - redis-cli
+        - ping
+      initialDelaySeconds: 5
+      periodSeconds: 5
+  
+  # Nginx reverse proxy
+  - name: nginx-proxy
+    image: nginx:1.21-alpine
+    ports:
+    - containerPort: 80
+      name: http
+    - containerPort: 443
+      name: https
+    volumeMounts:
+    - name: nginx-config
+      mountPath: /etc/nginx/conf.d
+    - name: app-logs
+      mountPath: /var/log/nginx
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+    securityContext:
+      runAsUser: 101
+      runAsGroup: 101
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+        add:
+        - NET_BIND_SERVICE
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 80
+      initialDelaySeconds: 10
+      periodSeconds: 10
+    readinessProbe:
+      httpGet:
+        path: /health
+        port: 80
+      initialDelaySeconds: 5
+      periodSeconds: 5
+  
+  # Prometheus metrics exporter
+  - name: metrics-exporter
+    image: prom/node-exporter:latest
+    ports:
+    - containerPort: 9100
+      name: metrics
+    args:
+    - --path.rootfs=/host
+    - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+)($|/)
+    - --collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
+    resources:
+      requests:
+        memory: "32Mi"
+        cpu: "25m"
+      limits:
+        memory: "64Mi"
+        cpu: "50m"
+    securityContext:
+      runAsUser: 65534
+      runAsGroup: 65534
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 9100
+      initialDelaySeconds: 10
+      periodSeconds: 10
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 9100
+      initialDelaySeconds: 5
+      periodSeconds: 5
+  
+  # Log shipping sidecar
+  - name: filebeat
+    image: docker.elastic.co/beats/filebeat:7.15.0
+    volumeMounts:
+    - name: app-logs
+      mountPath: /var/log/app
+      readOnly: true
+    - name: filebeat-config
+      mountPath: /usr/share/filebeat/filebeat.yml
+      subPath: filebeat.yml
+    env:
+    - name: ELASTICSEARCH_HOST
+      value: "elasticsearch.logging.svc.cluster.local"
+    - name: ELASTICSEARCH_PORT
+      value: "9200"
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "25m"
+      limits:
+        memory: "128Mi"
+        cpu: "50m"
+    securityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL

@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CKAD Multi-Container Scenarios</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #3b82f6;
+            --bg-color: #0f172a;
+            --surface-color: #1e293b;
+            --card-color: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: #475569;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --code-bg: #1e1e1e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Navigation */
+        .nav-container {
+            background: var(--surface-color);
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 0.5rem 1rem;
+            background: var(--card-color);
+            border: none;
+            border-radius: 8px;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        /* Search */
+        .search-container {
+            position: relative;
+            min-width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            background: var(--card-color);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem 0;
+            min-height: calc(100vh - 200px);
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .scenario-card {
+            background: var(--surface-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scenario-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+
+        .scenario-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            border-color: var(--primary-color);
+        }
+
+        .scenario-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .scenario-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .scenario-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-realworld { background: var(--success-color); color: white; }
+        .badge-exam { background: var(--warning-color); color: white; }
+        .badge-production { background: var(--primary-color); color: white; }
+        .badge-troubleshooting { background: var(--error-color); color: white; }
+        .badge-migration { background: #8b5cf6; color: white; }
+
+        .scenario-description {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .scenario-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            background: var(--card-color);
+            color: var(--text-muted);
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: var(--surface-color);
+            border-radius: 12px;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-color);
+            border-radius: 12px 12px 0 0;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: var(--error-color);
+            color: white;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        /* Code blocks */
+        .code-container {
+            position: relative;
+            margin: 1rem 0;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary-color);
+            border: none;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        pre {
+            background: var(--code-bg) !important;
+            border-radius: 8px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .nav {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .search-container {
+                min-width: 100%;
+            }
+
+            .scenario-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                max-width: 95vw;
+                margin: 1rem;
+            }
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: var(--surface-color);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .highlight {
+            background: rgba(37, 99, 235, 0.2);
+            padding: 0.1rem 0.2rem;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1><i class="fas fa-cube"></i> CKAD Multi-Container Scenarios</h1>
+            <p>Comprehensive guide to mastering multi-container patterns for CKAD certification</p>
+        </div>
+    </div>
+
+    <div class="nav-container">
+        <div class="container">
+            <div class="nav">
+                <div class="nav-links">
+                    <button class="nav-link active" onclick="showSection('overview')">
+                        <i class="fas fa-home"></i> Overview
+                    </button>
+                    <button class="nav-link" onclick="showSection('realworld')">
+                        <i class="fas fa-globe"></i> Real-World
+                    </button>
+                    <button class="nav-link" onclick="showSection('exam')">
+                        <i class="fas fa-certificate"></i> Exam Style
+                    </button>
+                    <button class="nav-link" onclick="showSection('production')">
+                        <i class="fas fa-industry"></i> Production
+                    </button>
+                    <button class="nav-link" onclick="showSection('troubleshooting')">
+                        <i class="fas fa-tools"></i> Troubleshooting
+                    </button>
+                    <button class="nav-link" onclick="showSection('migration')">
+                        <i class="fas fa-exchange-alt"></i> Migration
+                    </button>
+                </div>
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Search scenarios..." onkeyup="searchScenarios(this.value)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <!-- Overview Section -->
+            <div id="overview" class="content-section active">
+                <h2>📊 Overview</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">Total Scenarios</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">5</div>
+                        <div class="stat-label">Pattern Types</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">3</div>
+                        <div class="stat-label">Difficulty Levels</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">CKAD Coverage</div>
+                    </div>
+                </div>
+
+                <h3>🎯 Learning Objectives</h3>
+                <div style="background: var(--surface-color); padding: 2rem; border-radius: 12px; margin: 1rem 0;">
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin: 1rem 0;"><i class="fas fa-check-circle" style="color: var(--success-color); margin-right: 0.5rem;"></i> Master sidecar, ambassador, and adapter patterns</li>
+                        <li style="margin: 1rem 0;"><i class="fas fa-check-circle" style="color: var(--success-color); margin-right: 0.5rem;"></i> Understand real-world multi-container use cases</li>
+                        <li style="margin: 1rem 0;"><i class="fas fa-check-circle" style="color: var(--success-color); margin-right: 0.5rem;"></i> Practice CKAD exam-style scenarios</li>
+                        <li style="margin: 1rem 0;"><i class="fas fa-check-circle" style="color: var(--success-color); margin-right: 0.5rem;"></i> Learn production-ready implementations</li>
+                        <li style="margin: 1rem 0;"><i class="fas fa-check-circle" style="color: var(--success-color); margin-right: 0.5rem;"></i> Troubleshoot common multi-container issues</li>
+                    </ul>
+                </div>
+
+                <h3>🚀 Quick Start Guide</h3>
+                <div style="background: var(--card-color); padding: 1.5rem; border-radius: 8px; border-left: 4px solid var(--primary-color);">
+                    <ol style="color: var(--text-secondary);">
+                        <li>Start with <strong>Real-World</strong> scenarios to understand patterns</li>
+                        <li>Practice <strong>Exam Style</strong> questions for certification prep</li>
+                        <li>Explore <strong>Production</strong> use cases for real-world application</li>
+                        <li>Use <strong>Troubleshooting</strong> section for debugging skills</li>
+                        <li>Check <strong>Migration</strong> scenarios for modernization strategies</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Real-World Section -->
+            <div id="realworld" class="content-section">
+                <h2>🌍 Real-World Scenarios</h2>
+                <div class="scenario-grid" id="realworld-grid">
+                    <!-- Scenarios will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Exam Section -->
+            <div id="exam" class="content-section">
+                <h2>📜 Exam-Style Scenarios</h2>
+                <div class="scenario-grid" id="exam-grid">
+                    <!-- Scenarios will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Production Section -->
+            <div id="production" class="content-section">
+                <h2>🏭 Production Use Cases</h2>
+                <div class="scenario-grid" id="production-grid">
+                    <!-- Scenarios will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Troubleshooting Section -->
+            <div id="troubleshooting" class="content-section">
+                <h2>🔧 Troubleshooting Scenarios</h2>
+                <div class="scenario-grid" id="troubleshooting-grid">
+                    <!-- Scenarios will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Migration Section -->
+            <div id="migration" class="content-section">
+                <h2>🔄 Migration Scenarios</h2>
+                <div class="scenario-grid" id="migration-grid">
+                    <!-- Scenarios will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="scenarioModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle"></h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Scenario details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+    <script>
+        // Scenario data
+        const scenarios = {
+            realworld: [
+                {
+                    id: 1,
+                    title: "Microservices Logging Solution",
+                    description: "Implement sidecar pattern with log aggregation for multiple microservices with different logging formats.",
+                    tags: ["sidecar", "logging", "fluent-bit", "microservices"],
+                    difficulty: "intermediate",
+                    pattern: "Sidecar",
+                    yaml: `apiVersion: v1
+kind: Pod
+metadata:
+  name: microservice-with-logging
+spec:
+  volumes:
+  - name: log-volume
+    emptyDir: {}
+  
+  containers:
+  # Main microservice
+  - name: microservice
+    image: my-microservice:latest
+    volumeMounts:
+    - name: log-volume
+      mountPath: /var/log/app
+    env:
+    - name: LOG_LEVEL
+      value: "info"
+    - name: LOG_FORMAT
+      value: "json"
+  
+  # Fluent Bit log collector sidecar
+  - name: fluent-bit
+    image: fluent/fluent-bit:1.9
+    volumeMounts:
+    - name: log-volume
+      mountPath: /var/log/app
+      readOnly: true
+    - name: fluent-bit-config
+      mountPath: /fluent-bit/etc/
+    env:
+    - name: OUTPUT_HOST
+      value: "elasticsearch.logging.svc.cluster.local"
+    - name: OUTPUT_PORT
+      value: "9200"
+  
+  volumes:
+  - name: fluent-bit-config
+    configMap:
+      name: fluent-bit-config`,
+                    context: "You have multiple microservices that generate logs in different formats, and you need to centralize them for analysis.",
+                    challenge: "Each service has different logging patterns: Service A (JSON), Service B (Plain text), Service C (Custom format)",
+                    keyPoints: ["Sidecar containers for cross-cutting concerns", "Volume sharing for log collection", "Configuration management with ConfigMaps"]
+                },
+                {
+                    id: 2,
+                    title: "Database Connection Pooling",
+                    description: "Implement ambassador pattern with PgBouncer for database connection pooling and failover capabilities.",
+                    tags: ["ambassador", "pgbouncer", "database", "connection-pooling"],
+                    difficulty: "advanced",
+                    pattern: "Ambassador",
+                    yaml: `apiVersion: v1
+kind: Pod
+metadata:
+  name: app-with-db-proxy
+spec:
+  containers:
+  # Application
+  - name: web-app
+    image: my-web-app:latest
+    env:
+    - name: DATABASE_URL
+      value: "postgresql://app:password@localhost:5432/mydb"
+    ports:
+    - containerPort: 8080
+  
+  # PgBouncer ambassador
+  - name: pgbouncer
+    image: pgbouncer/pgbouncer:latest
+    env:
+    - name: DATABASES_HOST
+      value: "postgres-primary.default.svc.cluster.local"
+    - name: DATABASES_PORT
+      value: "5432"
+    - name: POOL_MODE
+      value: "session"
+    - name: MAX_CLIENT_CONN
+      value: "100"
+    - name: DEFAULT_POOL_SIZE
+      value: "20"
+    ports:
+    - containerPort: 5432
+    volumeMounts:
+    - name: pgbouncer-config
+      mountPath: /etc/pgbouncer
+  
+  volumes:
+  - name: pgbouncer-config
+    configMap:
+      name: pgbouncer-config`,
+                    context: "Your application needs to connect to a database with connection pooling and failover capabilities.",
+                    challenge: "High connection overhead to database, need for connection pooling, database failover requirements",
+                    keyPoints: ["Ambassador pattern for external service abstraction", "Connection pooling and resource optimization", "Service discovery and failover"]
+                }
+            ],
+            exam: [
+                {
+                    id: 3,
+                    title: "Multi-Container Debug Challenge",
+                    description: "Fix a pod with two containers that should share files, but the sidecar container can't see files created by the main container.",
+                    tags: ["debugging", "volumes", "permissions", "file-sharing"],
+                    difficulty: "intermediate",
+                    pattern: "Sidecar",
+                    yaml: `# BROKEN Configuration
+apiVersion: v1
+kind: Pod
+metadata:
+  name: file-sharing-pod
+spec:
+  containers:
+  - name: writer
+    image: busybox
+    command: ['sh', '-c', 'while true; do echo "data" > /app/file.txt; sleep 30; done']
+    volumeMounts:
+    - name: shared-volume
+      mountPath: /app
+  
+  - name: reader
+    image: busybox
+    command: ['sh', '-c', 'while true; do cat /data/file.txt; sleep 30; done']
+    volumeMounts:
+    - name: shared-volume
+      mountPath: /data  # Different mount path!
+  
+  volumes:
+  - name: shared-volume
+    emptyDir: {}
+
+---
+# FIXED Configuration
+apiVersion: v1
+kind: Pod
+metadata:
+  name: file-sharing-pod-fixed
+spec:
+  containers:
+  - name: writer
+    image: busybox
+    command: ['sh', '-c', 'while true; do echo "$(date): data" > /shared/file.txt; sleep 30; done']
+    volumeMounts:
+    - name: shared-volume
+      mountPath: /shared
+    securityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+  
+  - name: reader
+    image: busybox
+    command: ['sh', '-c', 'while true; do if [ -f /shared/file.txt ]; then cat /shared/file.txt; else echo "File not found"; fi; sleep 30; done']
+    volumeMounts:
+    - name: shared-volume
+      mountPath: /shared
+    securityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+  
+  volumes:
+  - name: shared-volume
+    emptyDir: {}
+  
+  securityContext:
+    fsGroup: 1000`,
+                    context: "CKAD exam question: You have a pod with two containers that should share files, but the sidecar container can't see files created by the main container.",
+                    challenge: "Issues to fix: 1. Mount paths are different between containers, 2. Missing proper volume definition, 3. Potential permission issues",
+                    keyPoints: ["Consistent mount paths across containers", "Proper security contexts", "Volume permission management"]
+                }
+            ],
+            production: [
+                {
+                    id: 4,
+                    title: "High-Traffic Web Application",
+                    description: "E-commerce platform with web app, Redis caching, metrics collection, log aggregation, and health monitoring.",
+                    tags: ["production", "redis", "nginx", "metrics", "logging"],
+                    difficulty: "advanced",
+                    pattern: "Multiple Sidecars",
+                    yaml: `apiVersion: v1
+kind: Pod
+metadata:
+  name: ecommerce-app
+  labels:
+    app: ecommerce
+    tier: frontend
+spec:
+  volumes:
+  - name: app-logs
+    emptyDir:
+      sizeLimit: 2Gi
+  - name: redis-data
+    emptyDir:
+      sizeLimit: 1Gi
+  - name: nginx-config
+    configMap:
+      name: nginx-config
+  
+  containers:
+  # Main web application
+  - name: web-app
+    image: ecommerce-web:v2.1
+    ports:
+    - containerPort: 8080
+      name: http
+    env:
+    - name: REDIS_URL
+      value: "redis://localhost:6379"
+    - name: LOG_LEVEL
+      value: "info"
+    volumeMounts:
+    - name: app-logs
+      mountPath: /var/log/app
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "300m"
+      limits:
+        memory: "1Gi"
+        cpu: "800m"
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 8080
+      initialDelaySeconds: 30
+      periodSeconds: 10
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8080
+      initialDelaySeconds: 10
+      periodSeconds: 5
+  
+  # Redis cache sidecar
+  - name: redis-cache
+    image: redis:6.2-alpine
+    ports:
+    - containerPort: 6379
+    volumeMounts:
+    - name: redis-data
+      mountPath: /data
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+      limits:
+        memory: "512Mi"
+        cpu: "200m"
+    command: ["redis-server", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+  
+  # Nginx reverse proxy
+  - name: nginx-proxy
+    image: nginx:1.21-alpine
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: nginx-config
+      mountPath: /etc/nginx/conf.d
+    - name: app-logs
+      mountPath: /var/log/nginx
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"`,
+                    context: "E-commerce platform with high traffic requirements",
+                    challenge: "Need web application serving HTTP traffic, Redis caching layer, metrics collection, log aggregation, and health monitoring",
+                    keyPoints: ["Multi-container pod with multiple sidecars", "Resource planning and limits", "Health checks and monitoring", "Production-ready configuration"]
+                }
+            ],
+            troubleshooting: [
+                {
+                    id: 5,
+                    title: "Container Communication Failure",
+                    description: "Debug and fix containers in the same pod that can't communicate via localhost.",
+                    tags: ["debugging", "networking", "localhost", "communication"],
+                    difficulty: "intermediate",
+                    pattern: "Troubleshooting",
+                    yaml: `# Problem: Application binding to 127.0.0.1 instead of 0.0.0.0
+# Solution: Ensure application binds to 0.0.0.0
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: communication-fixed
+spec:
+  containers:
+  - name: main-app
+    image: my-app:latest
+    env:
+    - name: BIND_ADDRESS
+      value: "0.0.0.0"  # Not 127.0.0.1
+    - name: PORT
+      value: "8080"
+    ports:
+    - containerPort: 8080
+  
+  - name: sidecar
+    image: my-sidecar:latest
+    # Now can communicate with main-app via localhost:8080`,
+                    context: "Containers in the same pod can't communicate via localhost",
+                    challenge: "curl: (7) Failed to connect to localhost port 8080: Connection refused",
+                    keyPoints: ["Applications must bind to 0.0.0.0, not 127.0.0.1", "Containers share network namespace", "Debug with netstat and nc commands"]
+                }
+            ],
+            migration: [
+                {
+                    id: 6,
+                    title: "Monolith to Microservices Migration",
+                    description: "Gradual migration strategy using sidecars to extract microservices from a monolithic application.",
+                    tags: ["migration", "monolith", "microservices", "strangler-pattern"],
+                    difficulty: "advanced",
+                    pattern: "Migration Strategy",
+                    yaml: `# Phase 1: Add sidecars to existing monolith
+apiVersion: v1
+kind: Pod
+metadata:
+  name: monolith-with-sidecars
+spec:
+  containers:
+  # Existing monolith (unchanged)
+  - name: monolith
+    image: legacy-monolith:latest
+    ports:
+    - containerPort: 8080
+  
+  # New microservice as sidecar
+  - name: user-service
+    image: user-microservice:latest
+    ports:
+    - containerPort: 8081
+    env:
+    - name: LEGACY_API_URL
+      value: "http://localhost:8080"
+  
+  # API gateway for routing
+  - name: api-gateway
+    image: nginx:alpine
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: gateway-config
+      mountPath: /etc/nginx/conf.d
+  
+  volumes:
+  - name: gateway-config
+    configMap:
+      name: migration-gateway-config
+
+---
+# Phase 2: Extract more services
+apiVersion: v1
+kind: Pod
+metadata:
+  name: partial-migration
+spec:
+  containers:
+  # Reduced monolith
+  - name: core-monolith
+    image: core-monolith:v2
+    ports:
+    - containerPort: 8080
+  
+  # Extracted microservices
+  - name: user-service
+    image: user-service:latest
+    ports:
+    - containerPort: 8081
+  
+  - name: order-service
+    image: order-service:latest
+    ports:
+    - containerPort: 8082`,
+                    context: "Migrating a monolithic application to microservices architecture",
+                    challenge: "Need gradual migration without breaking existing functionality",
+                    keyPoints: ["Strangler Fig pattern", "Gradual service extraction", "API gateway for routing", "Backward compatibility"]
+                }
+            ]
+        };
+
+        // Current active section and search term
+        let currentSection = 'overview';
+        let searchTerm = '';
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadScenarios();
+            Prism.highlightAll();
+        });
+
+        // Show specific section
+        function showSection(section) {
+            // Update navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update content
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(section).classList.add('active');
+
+            currentSection = section;
+        }
+
+        // Load scenarios into grids
+        function loadScenarios() {
+            Object.keys(scenarios).forEach(category => {
+                const grid = document.getElementById(`${category}-grid`);
+                if (grid) {
+                    grid.innerHTML = '';
+                    scenarios[category].forEach(scenario => {
+                        const card = createScenarioCard(scenario, category);
+                        grid.appendChild(card);
+                    });
+                }
+            });
+        }
+
+        // Create scenario card
+        function createScenarioCard(scenario, category) {
+            const card = document.createElement('div');
+            card.className = 'scenario-card';
+            card.onclick = () => showScenarioModal(scenario);
+
+            const badgeClass = `badge-${category}`;
+            const difficultyIcon = scenario.difficulty === 'beginner' ? 'fa-star' : 
+                                 scenario.difficulty === 'intermediate' ? 'fa-star-half-alt' : 'fa-star';
+
+            card.innerHTML = `
+                <div class="scenario-title">${scenario.title}</div>
+                <div class="scenario-meta">
+                    <span class="scenario-badge ${badgeClass}">${category.toUpperCase()}</span>
+                    <span style="color: var(--text-muted);">
+                        <i class="fas ${difficultyIcon}"></i> ${scenario.difficulty}
+                    </span>
+                    <span style="color: var(--text-muted);">
+                        <i class="fas fa-layer-group"></i> ${scenario.pattern}
+                    </span>
+                </div>
+                <div class="scenario-description">${scenario.description}</div>
+                <div class="scenario-tags">
+                    ${scenario.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                </div>
+            `;
+
+            return card;
+        }
+
+        // Show scenario modal
+        function showScenarioModal(scenario) {
+            const modal = document.getElementById('scenarioModal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+
+            title.textContent = scenario.title;
+            
+            body.innerHTML = `
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--primary-color); margin-bottom: 1rem;">📋 Context</h4>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">${scenario.context}</p>
+                    
+                    <h4 style="color: var(--warning-color); margin-bottom: 1rem;">⚡ Challenge</h4>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">${scenario.challenge}</p>
+                </div>
+                
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--success-color); margin-bottom: 1rem;">💡 Solution</h4>
+                    <div class="code-container">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                        <pre><code class="language-yaml">${scenario.yaml}</code></pre>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 style="color: var(--accent-color); margin-bottom: 1rem;">🔑 Key Learning Points</h4>
+                    <ul style="color: var(--text-secondary);">
+                        ${scenario.keyPoints.map(point => `<li style="margin: 0.5rem 0;">${point}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+
+            modal.classList.add('active');
+            
+            // Re-highlight syntax
+            setTimeout(() => {
+                Prism.highlightAll();
+            }, 100);
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('scenarioModal').classList.remove('active');
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(button) {
+            const codeBlock = button.nextElementSibling.querySelector('code');
+            const text = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                button.style.background = 'var(--success-color)';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.background = 'var(--primary-color)';
+                }, 2000);
+            });
+        }
+
+        // Search scenarios
+        function searchScenarios(term) {
+            searchTerm = term.toLowerCase();
+            
+            Object.keys(scenarios).forEach(category => {
+                const grid = document.getElementById(`${category}-grid`);
+                if (grid) {
+                    grid.innerHTML = '';
+                    
+                    const filteredScenarios = scenarios[category].filter(scenario => {
+                        return scenario.title.toLowerCase().includes(searchTerm) ||
+                               scenario.description.toLowerCase().includes(searchTerm) ||
+                               scenario.tags.some(tag => tag.toLowerCase().includes(searchTerm)) ||
+                               scenario.pattern.toLowerCase().includes(searchTerm);
+                    });
+                    
+                    filteredScenarios.forEach(scenario => {
+                        const card = createScenarioCard(scenario, category);
+                        grid.appendChild(card);
+                    });
+                    
+                    if (filteredScenarios.length === 0 && term) {
+                        grid.innerHTML = `
+                            <div style="text-align: center; color: var(--text-muted); grid-column: 1 / -1; padding: 2rem;">
+                                <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                                <p>No scenarios found matching "${term}"</p>
+                            </div>
+                        `;
+                    }
+                }
+            });
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('scenarioModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
