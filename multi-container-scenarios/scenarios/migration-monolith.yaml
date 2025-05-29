@@ -1,0 +1,368 @@
+# Migration Scenario: Monolith to Microservices
+# Pattern: Strangler Fig / Migration Strategy
+# Difficulty: Advanced
+
+# Phase 1: Monolith with Sidecar Services
+apiVersion: v1
+kind: Pod
+metadata:
+  name: monolith-phase1
+  labels:
+    migration-phase: "1"
+    pattern: strangler-fig
+spec:
+  containers:
+  # Existing monolith (unchanged initially)
+  - name: legacy-monolith
+    image: legacy-ecommerce:v1.0
+    ports:
+    - containerPort: 8080
+      name: http
+    env:
+    - name: DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          name: db-credentials
+          key: url
+    - name: FEATURE_FLAGS
+      value: "use_legacy_user_service=true,use_legacy_order_service=true"
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1000m"
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 8080
+      initialDelaySeconds: 30
+      periodSeconds: 10
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8080
+      initialDelaySeconds: 10
+      periodSeconds: 5
+  
+  # New microservice as sidecar (gradual extraction)
+  - name: user-service
+    image: user-microservice:v1.0
+    ports:
+    - containerPort: 8081
+      name: http
+    env:
+    - name: DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          name: db-credentials
+          key: url
+    - name: LEGACY_API_URL
+      value: "http://localhost:8080"
+    - name: SERVICE_MODE
+      value: "shadow"  # Shadow mode for gradual migration
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "200m"
+      limits:
+        memory: "512Mi"
+        cpu: "400m"
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 8081
+      initialDelaySeconds: 20
+      periodSeconds: 10
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8081
+      initialDelaySeconds: 5
+      periodSeconds: 5
+  
+  # API Gateway for routing decisions
+  - name: api-gateway
+    image: nginx:alpine
+    ports:
+    - containerPort: 80
+      name: http
+    volumeMounts:
+    - name: gateway-config
+      mountPath: /etc/nginx/conf.d
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 80
+      initialDelaySeconds: 10
+      periodSeconds: 10
+  
+  volumes:
+  - name: gateway-config
+    configMap:
+      name: migration-gateway-phase1
+
+---
+# Phase 2: Partial Migration
+apiVersion: v1
+kind: Pod
+metadata:
+  name: monolith-phase2
+  labels:
+    migration-phase: "2"
+    pattern: strangler-fig
+spec:
+  containers:
+  # Reduced monolith (user service extracted)
+  - name: core-monolith
+    image: core-ecommerce:v2.0  # Reduced functionality
+    ports:
+    - containerPort: 8080
+      name: http
+    env:
+    - name: DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          name: db-credentials
+          key: url
+    - name: USER_SERVICE_URL
+      value: "http://localhost:8081"
+    - name: FEATURE_FLAGS
+      value: "use_legacy_user_service=false,use_legacy_order_service=true"
+    resources:
+      requests:
+        memory: "768Mi"  # Reduced memory
+        cpu: "400m"     # Reduced CPU
+      limits:
+        memory: "1536Mi"
+        cpu: "800m"
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 8080
+      initialDelaySeconds: 30
+      periodSeconds: 10
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8080
+      initialDelaySeconds: 10
+      periodSeconds: 5
+  
+  # Extracted user microservice (now active)
+  - name: user-service
+    image: user-microservice:v2.0
+    ports:
+    - containerPort: 8081
+      name: http
+    env:
+    - name: DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          name: db-credentials
+          key: url
+    - name: SERVICE_MODE
+      value: "active"  # Now actively serving requests
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "200m"
+      limits:
+        memory: "512Mi"
+        cpu: "400m"
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 8081
+      initialDelaySeconds: 20
+      periodSeconds: 10
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8081
+      initialDelaySeconds: 5
+      periodSeconds: 5
+  
+  # New order service (shadow mode)
+  - name: order-service
+    image: order-microservice:v1.0
+    ports:
+    - containerPort: 8082
+      name: http
+    env:
+    - name: DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          name: db-credentials
+          key: url
+    - name: USER_SERVICE_URL
+      value: "http://localhost:8081"
+    - name: LEGACY_API_URL
+      value: "http://localhost:8080"
+    - name: SERVICE_MODE
+      value: "shadow"  # Shadow mode for testing
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "200m"
+      limits:
+        memory: "512Mi"
+        cpu: "400m"
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 8082
+      initialDelaySeconds: 20
+      periodSeconds: 10
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8082
+      initialDelaySeconds: 5
+      periodSeconds: 5
+  
+  # Updated API Gateway
+  - name: api-gateway
+    image: nginx:alpine
+    ports:
+    - containerPort: 80
+      name: http
+    volumeMounts:
+    - name: gateway-config
+      mountPath: /etc/nginx/conf.d
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+  
+  volumes:
+  - name: gateway-config
+    configMap:
+      name: migration-gateway-phase2
+
+---
+# Phase 3: Full Microservices
+apiVersion: v1
+kind: Pod
+metadata:
+  name: microservices-final
+  labels:
+    migration-phase: "3"
+    pattern: microservices
+spec:
+  containers:
+  # Core API (minimal functionality)
+  - name: api-core
+    image: api-core:v1.0
+    ports:
+    - containerPort: 8080
+      name: http
+    env:
+    - name: USER_SERVICE_URL
+      value: "http://localhost:8081"
+    - name: ORDER_SERVICE_URL
+      value: "http://localhost:8082"
+    - name: PRODUCT_SERVICE_URL
+      value: "http://localhost:8083"
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "200m"
+      limits:
+        memory: "512Mi"
+        cpu: "400m"
+  
+  # User microservice
+  - name: user-service
+    image: user-microservice:v3.0
+    ports:
+    - containerPort: 8081
+      name: http
+    env:
+    - name: DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          name: user-db-credentials
+          key: url
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "200m"
+      limits:
+        memory: "512Mi"
+        cpu: "400m"
+  
+  # Order microservice
+  - name: order-service
+    image: order-microservice:v2.0
+    ports:
+    - containerPort: 8082
+      name: http
+    env:
+    - name: DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          name: order-db-credentials
+          key: url
+    - name: USER_SERVICE_URL
+      value: "http://localhost:8081"
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "200m"
+      limits:
+        memory: "512Mi"
+        cpu: "400m"
+  
+  # Product microservice
+  - name: product-service
+    image: product-microservice:v1.0
+    ports:
+    - containerPort: 8083
+      name: http
+    env:
+    - name: DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          name: product-db-credentials
+          key: url
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "200m"
+      limits:
+        memory: "512Mi"
+        cpu: "400m"
+  
+  # API Gateway (final configuration)
+  - name: api-gateway
+    image: nginx:alpine
+    ports:
+    - containerPort: 80
+      name: http
+    volumeMounts:
+    - name: gateway-config
+      mountPath: /etc/nginx/conf.d
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+  
+  volumes:
+  - name: gateway-config
+    configMap:
+      name: migration-gateway-final

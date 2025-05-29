@@ -1,0 +1,208 @@
+# Filebeat Configuration for Log Shipping
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebeat-config
+  namespace: default
+data:
+  filebeat.yml: |
+    # Filebeat configuration for multi-container log shipping
+    
+    filebeat.inputs:
+    - type: log
+      enabled: true
+      paths:
+        - /var/log/app/*.log
+        - /var/log/app/access.log
+        - /var/log/app/error.log
+      fields:
+        service: ecommerce-web
+        environment: production
+        container: web-app
+      fields_under_root: true
+      multiline.pattern: '^\d{4}-\d{2}-\d{2}'
+      multiline.negate: true
+      multiline.match: after
+      json.keys_under_root: true
+      json.add_error_key: true
+    
+    - type: log
+      enabled: true
+      paths:
+        - /var/log/nginx/access.log
+      fields:
+        service: nginx-proxy
+        environment: production
+        container: nginx-proxy
+        log_type: access
+      fields_under_root: true
+      
+    - type: log
+      enabled: true
+      paths:
+        - /var/log/nginx/error.log
+      fields:
+        service: nginx-proxy
+        environment: production
+        container: nginx-proxy
+        log_type: error
+      fields_under_root: true
+      multiline.pattern: '^\d{4}/\d{2}/\d{2}'
+      multiline.negate: true
+      multiline.match: after
+    
+    # Processors to enhance log data
+    processors:
+    - add_host_metadata:
+        when.not.contains.tags: forwarded
+    - add_kubernetes_metadata:
+        host: ${NODE_NAME}
+        matchers:
+        - logs_path:
+            logs_path: "/var/log/containers/"
+    - drop_fields:
+        fields: ["beat", "input", "source", "offset"]
+    - timestamp:
+        field: '@timestamp'
+        layouts:
+        - '2006-01-02T15:04:05.000Z'
+        - '2006-01-02T15:04:05Z'
+        test:
+        - '2023-01-01T12:00:00.000Z'
+    
+    # Output configuration
+    output.elasticsearch:
+      hosts: ["${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}"]
+      index: "filebeat-ecommerce-%{+yyyy.MM.dd}"
+      template.name: "filebeat-ecommerce"
+      template.pattern: "filebeat-ecommerce-*"
+      template.settings:
+        index.number_of_shards: 1
+        index.number_of_replicas: 1
+        index.refresh_interval: "30s"
+    
+    # Alternative output for development/testing
+    #output.console:
+    #  pretty: true
+    #  enable: true
+    
+    # Logging configuration
+    logging.level: info
+    logging.to_files: true
+    logging.files:
+      path: /var/log/filebeat
+      name: filebeat
+      keepfiles: 7
+      permissions: 0644
+    
+    # Monitoring
+    monitoring.enabled: true
+    monitoring.elasticsearch:
+      hosts: ["${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}"]
+      index: "filebeat-monitoring"
+    
+    # Security settings (if needed)
+    #output.elasticsearch:
+    #  username: "${ELASTICSEARCH_USERNAME}"
+    #  password: "${ELASTICSEARCH_PASSWORD}"
+    #  ssl.certificate_authorities: ["/etc/ssl/certs/ca-certificates.crt"]
+    #  ssl.verification_mode: certificate
+
+---
+# Alternative Fluent Bit Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluent-bit-config
+  namespace: default
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Flush         5
+        Log_Level     info
+        Daemon        off
+        Parsers_File  parsers.conf
+        HTTP_Server   On
+        HTTP_Listen   0.0.0.0
+        HTTP_Port     2020
+        Health_Check  On
+    
+    [INPUT]
+        Name              tail
+        Path              /var/log/app/*.log
+        Parser            json
+        Tag               app.*
+        Refresh_Interval  5
+        Mem_Buf_Limit     5MB
+    
+    [INPUT]
+        Name              tail
+        Path              /var/log/nginx/access.log
+        Parser            nginx_access
+        Tag               nginx.access
+        Refresh_Interval  5
+    
+    [INPUT]
+        Name              tail
+        Path              /var/log/nginx/error.log
+        Parser            nginx_error
+        Tag               nginx.error
+        Refresh_Interval  5
+    
+    [FILTER]
+        Name kubernetes
+        Match app.*
+        Kube_URL https://kubernetes.default.svc:443
+        Kube_CA_File /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        Kube_Token_File /var/run/secrets/kubernetes.io/serviceaccount/token
+        Merge_Log On
+        K8S-Logging.Parser On
+        K8S-Logging.Exclude Off
+    
+    [FILTER]
+        Name modify
+        Match *
+        Add service ecommerce
+        Add environment production
+    
+    [OUTPUT]
+        Name  es
+        Match *
+        Host  ${OUTPUT_HOST}
+        Port  ${OUTPUT_PORT}
+        Index fluent-bit-logs
+        Type  _doc
+        Logstash_Format On
+        Logstash_Prefix fluent-bit
+        Logstash_DateFormat %Y.%m.%d
+        Include_Tag_Key On
+        Tag_Key tag
+        Retry_Limit 5
+        
+    [OUTPUT]
+        Name  stdout
+        Match nginx.*
+        Format json_lines
+  
+  parsers.conf: |
+    [PARSER]
+        Name        json
+        Format      json
+        Time_Key    timestamp
+        Time_Format %Y-%m-%dT%H:%M:%S.%L%z
+        Time_Keep   On
+    
+    [PARSER]
+        Name        nginx_access
+        Format      regex
+        Regex       ^(?<remote>[^ ]*) (?<host>[^ ]*) (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*?)(?: +\S*)?)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)" "(?<agent>[^\"]*)")
+        Time_Key    time
+        Time_Format %d/%b/%Y:%H:%M:%S %z
+    
+    [PARSER]
+        Name        nginx_error
+        Format      regex
+        Regex       ^(?<time>\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}) \[(?<level>\w+)\] (?<pid>\d+).(?<tid>\d+): (?<message>.*)
+        Time_Key    time
+        Time_Format %Y/%m/%d %H:%M:%S

@@ -1,0 +1,214 @@
+# Troubleshooting Scenario: Container Communication Failure
+# Pattern: Networking Debug
+# Difficulty: Intermediate
+
+# Problem: Containers can't communicate via localhost
+# Common Issue: Application binding to 127.0.0.1 instead of 0.0.0.0
+
+# BROKEN Configuration
+apiVersion: v1
+kind: Pod
+metadata:
+  name: communication-broken
+  labels:
+    scenario: networking-debug
+    status: broken
+spec:
+  containers:
+  - name: main-app
+    image: nginx:alpine
+    ports:
+    - containerPort: 80
+    # Problem: nginx default config binds to specific interfaces
+    volumeMounts:
+    - name: nginx-config
+      mountPath: /etc/nginx/conf.d/default.conf
+      subPath: default.conf
+  
+  - name: sidecar-client
+    image: curlimages/curl:latest
+    command: ['sh', '-c', 'while true; do echo "Attempting to connect..."; curl -f http://localhost:80 || echo "Connection failed"; sleep 10; done']
+  
+  volumes:
+  - name: nginx-config
+    configMap:
+      name: nginx-broken-config
+
+---
+# FIXED Configuration
+apiVersion: v1
+kind: Pod
+metadata:
+  name: communication-fixed
+  labels:
+    scenario: networking-debug
+    status: fixed
+spec:
+  containers:
+  - name: main-app
+    image: nginx:alpine
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: nginx-config
+      mountPath: /etc/nginx/conf.d/default.conf
+      subPath: default.conf
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 80
+      initialDelaySeconds: 10
+      periodSeconds: 10
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 80
+      initialDelaySeconds: 5
+      periodSeconds: 5
+  
+  - name: sidecar-client
+    image: curlimages/curl:latest
+    command: ['sh', '-c', 'while true; do echo "$(date): Attempting to connect..."; if curl -f -s http://localhost:80; then echo "✅ Connection successful!"; else echo "❌ Connection failed"; fi; sleep 10; done']
+  
+  - name: debug-helper
+    image: busybox
+    command: ['sh', '-c', 'while true; do echo "=== Network Debug Info ==="; netstat -tlnp 2>/dev/null || echo "netstat not available"; echo "=== Process List ==="; ps aux; sleep 60; done']
+  
+  volumes:
+  - name: nginx-config
+    configMap:
+      name: nginx-fixed-config
+
+---
+# ConfigMap for broken nginx (binds to specific interface)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-broken-config
+data:
+  default.conf: |
+    server {
+        listen 127.0.0.1:80;  # Problem: Only listening on loopback
+        server_name localhost;
+        
+        location / {
+            root   /usr/share/nginx/html;
+            index  index.html index.htm;
+        }
+    }
+
+---
+# ConfigMap for fixed nginx (binds to all interfaces)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-fixed-config
+data:
+  default.conf: |
+    server {
+        listen 0.0.0.0:80;  # Solution: Listen on all interfaces
+        server_name localhost;
+        
+        location / {
+            root   /usr/share/nginx/html;
+            index  index.html index.htm;
+        }
+        
+        # Health check endpoint
+        location /health {
+            access_log off;
+            return 200 "healthy\n";
+            add_header Content-Type text/plain;
+        }
+    }
+
+---
+# Advanced debugging pod with network tools
+apiVersion: v1
+kind: Pod
+metadata:
+  name: network-debug-advanced
+  labels:
+    scenario: networking-debug
+    status: advanced
+spec:
+  containers:
+  - name: web-server
+    image: python:3.9-alpine
+    command: ['python', '-c']
+    args:
+    - |
+      import http.server
+      import socketserver
+      import threading
+      import time
+      
+      class Handler(http.server.SimpleHTTPRequestHandler):
+          def do_GET(self):
+              if self.path == '/health':
+                  self.send_response(200)
+                  self.send_header('Content-type', 'text/plain')
+                  self.end_headers()
+                  self.wfile.write(b'OK')
+              else:
+                  self.send_response(200)
+                  self.send_header('Content-type', 'text/html')
+                  self.end_headers()
+                  self.wfile.write(b'<h1>Hello from Python server!</h1>')
+      
+      # Bind to all interfaces (0.0.0.0)
+      with socketserver.TCPServer(('0.0.0.0', 8000), Handler) as httpd:
+          print(f"Server running on 0.0.0.0:8000")
+          httpd.serve_forever()
+    ports:
+    - containerPort: 8000
+  
+  - name: client-tester
+    image: alpine/curl:latest
+    command: ['sh', '-c']
+    args:
+    - |
+      while true; do
+        echo "$(date): Testing connection..."
+        
+        # Test localhost connection
+        if curl -f -s http://localhost:8000/health; then
+          echo "✅ Localhost connection: SUCCESS"
+        else
+          echo "❌ Localhost connection: FAILED"
+        fi
+        
+        # Test direct IP connection (within same pod)
+        if curl -f -s http://127.0.0.1:8000/health; then
+          echo "✅ 127.0.0.1 connection: SUCCESS"
+        else
+          echo "❌ 127.0.0.1 connection: FAILED"
+        fi
+        
+        echo "---"
+        sleep 15
+      done
+  
+  - name: network-diagnostics
+    image: nicolaka/netshoot:latest
+    command: ['sh', '-c']
+    args:
+    - |
+      while true; do
+        echo "=== Network Diagnostics $(date) ==="
+        echo "--- Listening Ports ---"
+        netstat -tlnp 2>/dev/null || ss -tlnp
+        echo "--- Network Interfaces ---"
+        ip addr show
+        echo "--- Routing Table ---"
+        ip route show
+        echo "--- DNS Resolution ---"
+        nslookup localhost || echo "DNS lookup failed"
+        echo "=== End Diagnostics ==="
+        sleep 60
+      done
+    securityContext:
+      capabilities:
+        add:
+        - NET_ADMIN
+        - NET_RAW
