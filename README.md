@@ -2,7 +2,18 @@
 
 Welcome to the comprehensive **CKAD (Certified Kubernetes Application Developer)** preparation repository! This collection contains hands-on labs, scenarios, and interactive learning materials to help you master Kubernetes application development concepts.
 
-## 🌟 **NEW: Interactive Multi-Container Dashboard**
+## 🌟 **NEW: Master Kubernetes Canary Deployments**
+
+### 🎯 **Featured Addition**: 
+**[🚀 Master-Canary-Deployments](Master-Canary-Deployments/)** - Complete enterprise-grade canary deployment guide with:
+- **Production-ready examples** with real PowerShell applications
+- **Service mesh integration** (Istio, Linkerd)
+- **Advanced monitoring** with Prometheus, Grafana, and alerting
+- **Automated CI/CD pipelines** for GitLab and GitHub
+- **Troubleshooting guides** for complex scenarios
+- **Visual learning materials** with architecture diagrams
+
+## 🌟 **Interactive Multi-Container Dashboard**
 
 ### 🎯 **Live Demo**: 
 **[👉 Access Interactive Dashboard Here](https://salwan-mohamed.github.io/CKAD-journey/)**
@@ -44,6 +55,16 @@ Welcome to the comprehensive **CKAD (Certified Kubernetes Application Developer)
 
 ## 📚 Repository Structure
 
+### 🚀 **Advanced Deployment Strategies**
+- **[🎯 Master-Canary-Deployments](Master-Canary-Deployments/)** - Complete canary deployment mastery
+  - **[Complete Guide](Master-Canary-Deployments/canary-deployment-complete-guide.md)** - Theory and concepts
+  - **[Practical Implementation](Master-Canary-Deployments/canary-practical-implementation.md)** - Hands-on tutorial
+  - **[Production Examples](Master-Canary-Deployments/canary-yaml-examples.md)** - Enterprise manifests
+  - **[Advanced Strategies](Master-Canary-Deployments/canary-advanced-strategies.md)** - Service mesh and automation
+  - **[Troubleshooting](Master-Canary-Deployments/canary-troubleshooting.md)** - Debug like a pro
+  - **[Monitoring Setup](Master-Canary-Deployments/monitoring/)** - Observability stack
+  - **[Examples](Master-Canary-Deployments/examples/)** - Ready-to-use demos
+
 ### 🧩 Multi-Container Scenarios
 - **[Interactive Dashboard](https://salwan-mohamed.github.io/CKAD-journey/)** - Modern web interface
 - **[Scenario Files](multi-container-scenarios/scenarios/)** - Complete YAML configurations
@@ -63,7 +84,20 @@ Welcome to the comprehensive **CKAD (Certified Kubernetes Application Developer)
 
 ## 🎯 Learning Path
 
-### 1. **🚀 Start with Interactive Dashboard**
+### 1. **🚀 Start with Canary Deployments**
+   ```bash
+   # Explore the comprehensive canary guide
+   cd Master-Canary-Deployments/
+   
+   # Try the 5-minute demo
+   cd examples/simple-webapp/
+   kubectl apply -f .
+   
+   # Follow the complete implementation guide
+   # See: canary-practical-implementation.md
+   ```
+
+### 2. **📚 Explore Interactive Dashboard**
    ```bash
    # Visit the live dashboard
    https://salwan-mohamed.github.io/CKAD-journey/
@@ -75,14 +109,14 @@ Welcome to the comprehensive **CKAD (Certified Kubernetes Application Developer)
    # or open docs/index.html in your browser
    ```
 
-### 2. **📖 Explore Scenario Categories**
+### 3. **📚 Explore Scenario Categories**
    - **Real-World**: Understand practical patterns
    - **Exam-Style**: Practice CKAD debugging
    - **Production**: Learn enterprise implementations
    - **Troubleshooting**: Master problem-solving
    - **Migration**: Modernization strategies
 
-### 3. **🛠 Hands-On Practice**
+### 4. **🛠 Hands-On Practice**
    ```bash
    # Apply any scenario
    kubectl apply -f multi-container-scenarios/scenarios/microservices-logging.yaml
@@ -95,16 +129,18 @@ Welcome to the comprehensive **CKAD (Certified Kubernetes Application Developer)
    kubectl logs <pod-name> -c <container-name>
    ```
 
-### 4. **🎓 Master Core Concepts**
+### 5. **🎓 Master Core Concepts**
    - Pod creation and management
    - ConfigMaps and Secrets
    - Health checks and probes
    - Resource management
+   - Advanced deployment strategies
 
 ---
 
 ## 🌟 Key Features
 
+- ✅ **Enterprise Canary Deployments** - Production-ready strategies with service mesh
 - ✅ **Interactive Learning** - Modern web interfaces with hands-on examples
 - ✅ **Real-World Scenarios** - Production-ready configurations and patterns
 - ✅ **CKAD Exam Focus** - Targeted preparation for certification success
@@ -112,6 +148,7 @@ Welcome to the comprehensive **CKAD (Certified Kubernetes Application Developer)
 - ✅ **Best Practices** - Industry-standard implementations and security
 - ✅ **Troubleshooting Guides** - Debug common issues effectively
 - ✅ **Copy-Paste Ready** - All configurations ready to use
+- ✅ **Visual Learning** - Architecture diagrams and monitoring dashboards
 
 ---
 
@@ -123,15 +160,17 @@ This repository covers all major CKAD exam domains:
   - Multi-container applications
   - Container images and registries
   - Application configuration
+  - **NEW**: Advanced deployment patterns
 
 - ✅ **Application Deployment (20%)**
   - Deployment strategies
   - Rolling updates
+  - **NEW**: Canary deployments
   - Scaling applications
 
 - ✅ **Application Observability and Maintenance (15%)**
   - Health checks and probes
-  - Monitoring and logging
+  - **NEW**: Advanced monitoring with Prometheus/Grafana
   - Debugging applications
 
 - ✅ **Application Environment, Configuration and Security (25%)**
@@ -141,6 +180,7 @@ This repository covers all major CKAD exam domains:
 
 - ✅ **Services and Networking (20%)**
   - Service discovery
+  - **NEW**: Service mesh integration
   - Network policies
   - Ingress controllers
 
@@ -148,7 +188,17 @@ This repository covers all major CKAD exam domains:
 
 ## 🚀 Quick Start Examples
 
-### Example 1: Microservices Logging
+### Example 1: Canary Deployment (NEW!)
+```bash
+# Deploy complete canary setup
+kubectl apply -f Master-Canary-Deployments/examples/simple-webapp/
+
+# Monitor traffic distribution
+kubectl run client --image=curlimages/curl --rm -it -- sh
+# Inside pod: for i in {1..20}; do curl -s http://webapp-service.canary-demo.svc.cluster.local | grep Version; done
+```
+
+### Example 2: Microservices Logging
 ```bash
 # Deploy logging sidecar scenario
 kubectl apply -f multi-container-scenarios/scenarios/microservices-logging.yaml
@@ -158,7 +208,7 @@ kubectl logs microservice-with-logging -c microservice
 kubectl logs microservice-with-logging -c fluent-bit
 ```
 
-### Example 2: Debug Challenge
+### Example 3: Debug Challenge
 ```bash
 # Deploy broken configuration
 kubectl apply -f multi-container-scenarios/scenarios/exam-debug-challenge.yaml
@@ -168,7 +218,7 @@ kubectl describe pod file-sharing-pod-broken
 kubectl logs file-sharing-pod-broken -c reader
 ```
 
-### Example 3: Production Setup
+### Example 4: Production Setup
 ```bash
 # Deploy production e-commerce app
 kubectl apply -f multi-container-scenarios/scenarios/production-ecommerce.yaml
@@ -213,31 +263,39 @@ alias kl='kubectl logs'
 # Multi-container specific
 alias klc='kubectl logs -c'      # klc pod-name container-name
 alias kexc='kubectl exec -it -c' # kexc pod-name container-name -- command
+
+# Canary deployment specific
+alias kgs='kubectl get service'
+alias kge='kubectl get endpoints'
 ```
 
 ### 🎯 **Exam Strategy**
-1. **Use the Interactive Dashboard** for pattern recognition
-2. **Practice debugging scenarios** until they become automatic
-3. **Master kubectl shortcuts** for speed
-4. **Focus on multi-container communication** issues
-5. **Understand resource management** thoroughly
+1. **Master Canary Deployments** - New advanced topic for competitive advantage
+2. **Use the Interactive Dashboard** for pattern recognition
+3. **Practice debugging scenarios** until they become automatic
+4. **Master kubectl shortcuts** for speed
+5. **Focus on multi-container communication** issues
+6. **Understand service mesh basics** for advanced scenarios
 
 ### 📋 **Common Exam Patterns**
 - Volume sharing between containers
 - Init containers for dependencies
 - Sidecar containers for logging/monitoring
+- **NEW**: Traffic splitting and canary deployments
 - Resource limits and requests
 - Security contexts and permissions
+- **NEW**: Service mesh configuration
 
 ---
 
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to:
-- Add new scenarios and examples
+- Add new canary deployment examples
 - Improve existing documentation
 - Fix bugs or issues
 - Share your learning experiences
+- Add monitoring and observability examples
 
 ### How to Contribute
 1. Fork the repository
@@ -253,6 +311,8 @@ Contributions are welcome! Please feel free to:
 - [CKAD Exam Curriculum](https://github.com/cncf/curriculum)
 - [kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
 - [Kubernetes Best Practices](https://kubernetes.io/docs/concepts/cluster-administration/manage-deployment/)
+- [Istio Documentation](https://istio.io/latest/docs/)
+- [Prometheus Monitoring](https://prometheus.io/docs/)
 
 ---
 
@@ -261,11 +321,14 @@ Contributions are welcome! Please feel free to:
 *Share your CKAD certification success story by opening an issue or PR!*
 
 ### 📈 Repository Stats
+- **1 Advanced Deployment Guide** (Canary)
 - **12+ Interactive Scenarios**
 - **50+ YAML Configurations** 
 - **5 Multi-Container Patterns**
 - **100% CKAD Domain Coverage**
 - **Production-Ready Examples**
+- **Enterprise Monitoring Stack**
+- **Service Mesh Integration**
 
 ---
 
@@ -279,4 +342,4 @@ If this repository helped you with your CKAD journey, please ⭐ **star it** to 
 
 *Last updated: December 2024*
 
-> **💡 Tip**: Bookmark the [Interactive Dashboard](https://salwan-mohamed.github.io/CKAD-journey/) for quick access during your studies!
+> **💡 Tip**: Bookmark the [Interactive Dashboard](https://salwan-mohamed.github.io/CKAD-journey/) and start with [Canary Deployments](Master-Canary-Deployments/) for cutting-edge Kubernetes skills!

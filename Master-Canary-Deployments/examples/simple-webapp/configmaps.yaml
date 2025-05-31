@@ -1,0 +1,299 @@
+# ConfigMaps for Simple Web App Content
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: webapp-v1-content
+  namespace: canary-demo
+  labels:
+    app.kubernetes.io/name: webapp
+    app.kubernetes.io/version: v1.0
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Canary Demo - Version 1.0</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                text-align: center;
+                padding: 50px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                margin: 0;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 40px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 15px;
+                backdrop-filter: blur(10px);
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            }
+            h1 {
+                font-size: 2.5em;
+                margin-bottom: 20px;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            }
+            .version {
+                font-size: 1.8em;
+                font-weight: bold;
+                color: #4CAF50;
+                margin: 20px 0;
+                padding: 15px;
+                background: rgba(76, 175, 80, 0.2);
+                border-radius: 10px;
+                border: 2px solid #4CAF50;
+            }
+            .info {
+                font-size: 1.1em;
+                margin: 20px 0;
+                line-height: 1.6;
+            }
+            .timestamp {
+                font-size: 0.9em;
+                opacity: 0.8;
+                margin-top: 30px;
+            }
+            .feature {
+                background: rgba(255, 255, 255, 0.2);
+                padding: 10px;
+                margin: 10px 0;
+                border-radius: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🚀 CKAD Journey - Canary Demo</h1>
+            <div class="version">Version 1.0 - Stable Release</div>
+            
+            <div class="info">
+                <p>This is the <strong>stable version</strong> of our application running in a Kubernetes cluster.</p>
+                <p>You're currently viewing the baseline version that handles most of the production traffic.</p>
+            </div>
+            
+            <div class="feature">
+                ✅ <strong>Core Features Available:</strong><br>
+                • Basic user interface<br>
+                • Standard functionality<br>
+                • Proven stability<br>
+                • Full monitoring
+            </div>
+            
+            <div class="timestamp">
+                🕰 Deployed: <span id="timestamp"></span><br>
+                🔍 Pod: <span id="hostname"></span>
+            </div>
+        </div>
+        
+        <script>
+            document.getElementById('timestamp').textContent = new Date().toISOString();
+            document.getElementById('hostname').textContent = window.location.hostname || 'localhost';
+        </script>
+    </body>
+    </html>
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: webapp-v2-content
+  namespace: canary-demo
+  labels:
+    app.kubernetes.io/name: webapp
+    app.kubernetes.io/version: v2.0
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Canary Demo - Version 2.0</title>
+        <style>
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                text-align: center;
+                padding: 50px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%, #f093fb 100%);
+                color: white;
+                margin: 0;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                animation: gradientShift 8s ease infinite;
+            }
+            @keyframes gradientShift {
+                0% { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+                50% { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+                100% { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+            }
+            .container {
+                max-width: 700px;
+                margin: 0 auto;
+                padding: 40px;
+                background: rgba(255, 255, 255, 0.15);
+                border-radius: 20px;
+                backdrop-filter: blur(15px);
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+                border: 1px solid rgba(255, 255, 255, 0.18);
+            }
+            h1 {
+                font-size: 2.8em;
+                margin-bottom: 20px;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+                animation: pulse 2s ease-in-out infinite alternate;
+            }
+            @keyframes pulse {
+                from { transform: scale(1); }
+                to { transform: scale(1.05); }
+            }
+            .version {
+                font-size: 2em;
+                font-weight: bold;
+                color: #FF6B6B;
+                margin: 20px 0;
+                padding: 20px;
+                background: rgba(255, 107, 107, 0.2);
+                border-radius: 15px;
+                border: 2px solid #FF6B6B;
+                animation: glow 2s ease-in-out infinite alternate;
+            }
+            @keyframes glow {
+                from { box-shadow: 0 0 20px rgba(255, 107, 107, 0.5); }
+                to { box-shadow: 0 0 30px rgba(255, 107, 107, 0.8); }
+            }
+            .new-badge {
+                background: #FF4757;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 20px;
+                font-size: 0.7em;
+                margin-left: 10px;
+                animation: bounce 1s infinite;
+            }
+            @keyframes bounce {
+                0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+                40% { transform: translateY(-10px); }
+                60% { transform: translateY(-5px); }
+            }
+            .info {
+                font-size: 1.2em;
+                margin: 25px 0;
+                line-height: 1.7;
+            }
+            .features {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+                margin: 25px 0;
+            }
+            .feature {
+                background: rgba(255, 255, 255, 0.25);
+                padding: 15px;
+                border-radius: 10px;
+                border-left: 4px solid #4ECDC4;
+                transition: transform 0.3s ease;
+            }
+            .feature:hover {
+                transform: translateY(-5px);
+            }
+            .timestamp {
+                font-size: 1em;
+                opacity: 0.9;
+                margin-top: 30px;
+                padding: 15px;
+                background: rgba(0, 0, 0, 0.2);
+                border-radius: 10px;
+            }
+            .stats {
+                display: flex;
+                justify-content: space-around;
+                margin: 20px 0;
+            }
+            .stat {
+                text-align: center;
+            }
+            .stat-number {
+                font-size: 2em;
+                font-weight: bold;
+                color: #4ECDC4;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🎆 CKAD Journey - Canary Demo</h1>
+            <div class="version">
+                Version 2.0 - Enhanced Release
+                <span class="new-badge">NEW</span>
+            </div>
+            
+            <div class="info">
+                <p>Welcome to the <strong>canary version</strong> with exciting new features!</p>
+                <p>This version is currently being tested with a subset of users before full rollout.</p>
+            </div>
+            
+            <div class="features">
+                <div class="feature">
+                    ✨ <strong>Enhanced UI</strong><br>
+                    Modern design with animations
+                </div>
+                <div class="feature">
+                    📊 <strong>Advanced Analytics</strong><br>
+                    Real-time user metrics
+                </div>
+                <div class="feature">
+                    🔒 <strong>Improved Security</strong><br>
+                    Enhanced authentication
+                </div>
+                <div class="feature">
+                    🚀 <strong>Performance Boost</strong><br>
+                    50% faster load times
+                </div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number" id="requests">0</div>
+                    <div>Requests</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="uptime">0s</div>
+                    <div>Uptime</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">99.9%</div>
+                    <div>Reliability</div>
+                </div>
+            </div>
+            
+            <div class="timestamp">
+                🕰 Deployed: <span id="timestamp"></span><br>
+                🔍 Pod: <span id="hostname"></span><br>
+                🎯 Canary Traffic: Active
+            </div>
+        </div>
+        
+        <script>
+            document.getElementById('timestamp').textContent = new Date().toISOString();
+            document.getElementById('hostname').textContent = window.location.hostname || 'localhost';
+            
+            // Simulate real-time stats
+            let requestCount = Math.floor(Math.random() * 1000) + 500;
+            let startTime = Date.now();
+            
+            setInterval(() => {
+                requestCount += Math.floor(Math.random() * 5) + 1;
+                document.getElementById('requests').textContent = requestCount.toLocaleString();
+                
+                const uptime = Math.floor((Date.now() - startTime) / 1000);
+                document.getElementById('uptime').textContent = uptime + 's';
+            }, 1000);
+        </script>
+    </body>
+    </html>

@@ -1,0 +1,21 @@
+# Service for Simple Web App
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-service
+  namespace: canary-demo
+  labels:
+    app.kubernetes.io/name: webapp
+    app.kubernetes.io/component: frontend
+spec:
+  type: LoadBalancer  # Change to ClusterIP for internal access only
+  selector:
+    app.kubernetes.io/name: webapp
+    # Initially route only to v1
+    app.kubernetes.io/version: v1.0
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  sessionAffinity: None
