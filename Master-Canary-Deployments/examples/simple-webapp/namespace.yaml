@@ -1,0 +1,9 @@
+# Simple Web App Canary Example - Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: canary-demo
+  labels:
+    name: canary-demo
+    environment: demo
+    deployment-strategy: canary
