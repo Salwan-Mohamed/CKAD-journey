@@ -1,0 +1,101 @@
+<svg width="600" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font-family: Arial, sans-serif; font-size: 20px; font-weight: bold; text-anchor: middle; }
+      .label { font-family: Arial, sans-serif; font-size: 14px; text-anchor: middle; }
+      .small-label { font-family: Arial, sans-serif; font-size: 12px; text-anchor: middle; }
+      .component { fill: white; stroke: #333; stroke-width: 2; }
+      .api-server { fill: #e8f5e8; stroke: #4caf50; stroke-width: 2; }
+      .desired { fill: #e3f2fd; stroke: #1976d2; stroke-width: 2; }
+      .current { fill: #fff3e0; stroke: #ff9800; stroke-width: 2; }
+      .controller { fill: #f3e5f5; stroke: #9c27b0; stroke-width: 3; }
+      .actions { fill: #ffebee; stroke: #f44336; stroke-width: 2; }
+      .resources { fill: #e0f2f1; stroke: #009688; stroke-width: 2; }
+      .connection { stroke: #333; stroke-width: 2; fill: none; }
+      .loop-arrow { stroke: #9c27b0; stroke-width: 3; fill: none; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+    <marker id="purple-arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#9c27b0"/>
+    </marker>
+  </defs>
+  
+  <!-- Title -->
+  <text x="300" y="25" class="title">Controller Reconciliation Pattern</text>
+  
+  <!-- API Server (central) -->
+  <ellipse cx="300" cy="120" rx="60" ry="30" class="api-server"/>
+  <text x="300" y="125" class="label">API Server</text>
+  
+  <!-- Desired State -->
+  <rect x="80" y="80" width="120" height="80" class="desired" rx="10"/>
+  <text x="140" y="105" class="label">Desired</text>
+  <text x="140" y="120" class="label">State</text>
+  <text x="140" y="140" class="small-label">(YAML specs)</text>
+  <text x="140" y="155" class="small-label">(User intent)</text>
+  
+  <!-- Current State -->
+  <rect x="400" y="80" width="120" height="80" class="current" rx="10"/>
+  <text x="460" y="105" class="label">Current</text>
+  <text x="460" y="120" class="label">State</text>
+  <text x="460" y="140" class="small-label">(Actual)</text>
+  <text x="460" y="155" class="small-label">(Observed)</text>
+  
+  <!-- Controller (central reconciliation loop) -->
+  <circle cx="300" cy="300" r="80" class="controller"/>
+  <circle cx="300" cy="300" r="40" fill="#f3e5f5" stroke="#9c27b0" stroke-width="2"/>
+  <text x="300" y="290" class="label">🔄</text>
+  <text x="300" y="305" class="label">Controller</text>
+  <text x="300" y="320" class="label">logic</text>
+  
+  <!-- Watch connection -->
+  <path d="M 140 180 Q 180 220 240 300" class="connection" marker-end="url(#arrow)"/>
+  <text x="170" y="220" class="small-label">Watch</text>
+  
+  <path d="M 460 180 Q 420 220 360 300" class="connection" marker-end="url(#arrow)"/>
+  <text x="430" y="220" class="small-label">Act</text>
+  
+  <!-- Actions section -->
+  <rect x="200" y="450" width="200" height="60" class="actions" rx="10"/>
+  <text x="300" y="470" class="label">Actions</text>
+  <text x="250" y="490" class="small-label">• Deployment</text>
+  <text x="250" y="505" class="small-label">• Service</text>
+  
+  <!-- Cluster resources -->
+  <rect x="450" y="400" width="120" height="100" class="resources" rx="10"/>
+  <text x="510" y="420" class="label">Cluster</text>
+  <text x="510" y="435" class="label">resources</text>
+  <text x="480" y="455" class="small-label">☁️</text>
+  <text x="480" y="475" class="small-label">🖥️</text>
+  <text x="480" y="495" class="small-label">📦</text>
+  
+  <!-- Time-based loop -->
+  <path d="M 220 320 Q 150 360 150 400 Q 150 440 220 460" class="loop-arrow" marker-end="url(#purple-arrow)"/>
+  <text x="120" y="360" class="small-label">Time</text>
+  
+  <!-- Repeat loop -->
+  <path d="M 380 320 Q 450 360 450 400 Q 450 440 380 460" class="loop-arrow" marker-end="url(#purple-arrow)"/>
+  <text x="470" y="360" class="small-label">Repeat</text>
+  
+  <!-- Retry on error -->
+  <path d="M 180 480 Q 120 520 120 560 Q 120 580 180 580 Q 240 580 300 560" class="loop-arrow" marker-end="url(#purple-arrow)"/>
+  <text x="120" y="540" class="small-label">Retry</text>
+  <text x="120" y="555" class="small-label">on error</text>
+  
+  <!-- Actions to resources -->
+  <line x1="400" y1="480" x2="450" y2="450" class="connection" marker-end="url(#arrow)"/>
+  
+  <!-- Controller to actions -->
+  <line x1="300" y1="380" x2="300" y2="450" class="connection" marker-end="url(#arrow)"/>
+  
+  <!-- API Server connections -->
+  <line x1="200" y1="120" x2="240" y2="120" class="connection" marker-end="url(#arrow)"/>
+  <line x1="360" y1="120" x2="400" y2="120" class="connection" marker-end="url(#arrow)"/>
+  
+  <!-- Reconciliation flow labels -->
+  <text x="50" y="560" class="small-label">1. Watch for changes</text>
+  <text x="50" y="575" class="small-label">2. Compare desired vs actual</text>
+  <text x="50" y="590" class="small-label">3. Take corrective actions</text>
+</svg>
