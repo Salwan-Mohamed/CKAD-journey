@@ -1,0 +1,124 @@
+<svg width="700" height="550" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font-family: Arial, sans-serif; font-size: 20px; font-weight: bold; text-anchor: middle; }
+      .label { font-family: Arial, sans-serif; font-size: 14px; text-anchor: middle; }
+      .small-label { font-family: Arial, sans-serif; font-size: 12px; text-anchor: middle; }
+      .stage { fill: white; stroke: #333; stroke-width: 2; }
+      .pod { fill: #e3f2fd; stroke: #1976d2; stroke-width: 2; }
+      .filter { fill: #fff3e0; stroke: #ff9800; stroke-width: 2; }
+      .score { fill: #e8f5e8; stroke: #4caf50; stroke-width: 2; }
+      .node { fill: #f3e5f5; stroke: #9c27b0; stroke-width: 2; }
+      .connection { stroke: #333; stroke-width: 2; fill: none; }
+      .rejected { fill: #ffebee; stroke: #f44336; stroke-width: 2; }
+      .selected { fill: #e0f2f1; stroke: #009688; stroke-width: 2; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+  </defs>
+  
+  <!-- Title -->
+  <text x="350" y="25" class="title">Kubernetes Scheduler Decision Process</text>
+  
+  <!-- New Pod Input -->
+  <rect x="250" y="50" width="200" height="40" class="pod" rx="20"/>
+  <text x="350" y="65" class="label">New Pod</text>
+  <text x="350" y="80" class="small-label">needing placement</text>
+  
+  <!-- Phase 1: Filtering -->
+  <rect x="150" y="130" width="400" height="60" class="filter" rx="10"/>
+  <text x="350" y="150" class="label">Phase 1: Filtering</text>
+  <text x="350" y="170" class="small-label">(nodes that meet requirements.)</text>
+  
+  <!-- Filter criteria -->
+  <g id="filter-criteria">
+    <circle cx="500" cy="130" r="15" class="stage"/>
+    <text x="500" y="135" class="small-label">Resource</text>
+    <text x="520" y="120" class="small-label">availability</text>
+    
+    <circle cx="500" cy="155" r="15" class="stage"/>
+    <text x="500" y="160" class="small-label">Node affinity</text>
+    
+    <circle cx="500" cy="180" r="15" class="stage"/>
+    <text x="500" y="185" class="small-label">Pod affinity/</text>
+    <text x="520" y="200" class="small-label">anti-affinity</text>
+    
+    <circle cx="500" cy="210" r="15" class="stage"/>
+    <text x="500" y="215" class="small-label">Taints/</text>
+    <text x="520" y="230" class="small-label">tolerations</text>
+  </g>
+  
+  <!-- Nodes in filtering -->
+  <g id="filtering-nodes">
+    <circle cx="80" cy="160" r="25" class="node"/>
+    <text x="80" y="165" class="small-label">✓</text>
+    
+    <circle cx="620" cy="140" r="25" class="rejected"/>
+    <text x="620" y="145" class="small-label">✗</text>
+    
+    <circle cx="620" cy="180" r="25" class="rejected"/>
+    <text x="620" y="185" class="small-label">✗</text>
+  </g>
+  
+  <!-- Arrow from pod to filtering -->
+  <line x1="350" y1="90" x2="350" y2="130" class="connection" marker-end="url(#arrow)"/>
+  
+  <!-- Phase 2: Scoring -->
+  <rect x="150" y="260" width="400" height="80" class="score" rx="10"/>
+  <text x="350" y="285" class="label">Phase 2: Scoring</text>
+  <text x="350" y="300" class="small-label">Ranking suitable</text>
+  <text x="350" y="315" class="small-label">nodes</text>
+  
+  <!-- Scoring matrix -->
+  <g id="scoring-matrix">
+    <rect x="200" y="320" width="30" height="15" fill="white" stroke="#333"/>
+    <rect x="230" y="320" width="30" height="15" fill="#81c784" stroke="#333"/>
+    <rect x="260" y="320" width="30" height="15" fill="white" stroke="#333"/>
+    <rect x="290" y="320" width="30" height="15" fill="white" stroke="#333"/>
+    <rect x="320" y="320" width="30" height="15" fill="#81c784" stroke="#333"/>
+    <rect x="350" y="320" width="30" height="15" fill="white" stroke="#333"/>
+    
+    <rect x="200" y="305" width="30" height="15" fill="white" stroke="#333"/>
+    <rect x="230" y="305" width="30" height="15" fill="#81c784" stroke="#333"/>
+    <rect x="260" y="305" width="30" height="15" fill="#81c784" stroke="#333"/>
+    <rect x="290" y="305" width="30" height="15" fill="#81c784" stroke="#333"/>
+    <rect x="320" y="305" width="30" height="15" fill="#81c784" stroke="#333"/>
+    <rect x="350" y="305" width="30" height="15" fill="white" stroke="#333"/>
+    
+    <rect x="200" y="290" width="30" height="15" fill="#81c784" stroke="#333"/>
+    <rect x="230" y="290" width="30" height="15" fill="#81c784" stroke="#333"/>
+    <rect x="260" y="290" width="30" height="15" fill="white" stroke="#333"/>
+    <rect x="290" y="290" width="30" height="15" fill="white" stroke="#333"/>
+    <rect x="320" y="290" width="30" height="15" fill="white" stroke="#333"/>
+    <rect x="350" y="290" width="30" height="15" fill="white" stroke="#333"/>
+    
+    <text x="420" y="310" class="small-label">Chosen</text>
+    <text x="420" y="325" class="small-label">Node</text>
+  </g>
+  
+  <!-- Arrow from filtering to scoring -->
+  <line x1="350" y1="190" x2="350" y2="260" class="connection" marker-end="url(#arrow)"/>
+  
+  <!-- Chosen Node -->
+  <ellipse cx="350" cy="420" rx="80" ry="30" class="selected"/>
+  <text x="350" y="415" class="label">✓</text>
+  <text x="350" y="430" class="label">Chosen Node</text>
+  
+  <!-- Arrow from scoring to chosen node -->
+  <line x1="350" y1="340" x2="350" y2="390" class="connection" marker-end="url(#arrow)"/>
+  
+  <!-- kubelet action -->
+  <rect x="250" y="480" width="200" height="40" class="pod" rx="20"/>
+  <text x="350" y="500" class="label">kubelet (create Pod)</text>
+  
+  <!-- Arrow from chosen node to kubelet -->
+  <line x1="350" y1="450" x2="350" y2="480" class="connection" marker-end="url(#arrow)"/>
+  
+  <!-- Side annotations -->
+  <text x="50" y="170" class="small-label">Suitable</text>
+  <text x="50" y="185" class="small-label">nodes</text>
+  
+  <text x="650" y="150" class="small-label">Filtered</text>
+  <text x="650" y="165" class="small-label">out</text>
+</svg>
