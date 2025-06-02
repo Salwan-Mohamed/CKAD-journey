@@ -1,0 +1,351 @@
+# RBAC (Role-Based Access Control) Examples
+
+## Purpose
+Demonstrates Kubernetes security architecture through practical RBAC configurations that align with the Defense in Depth security model covered in the architecture guide.
+
+## CKAD Relevance
+- **Security Contexts**: 20% of CKAD exam
+- **Understanding RBAC**: Essential for application deployment
+- **ServiceAccounts**: Required for pod-to-API communication
+
+---
+
+## Example 1: Developer Role with Namespace Isolation
+
+```yaml
+# Namespace for development team
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: development
+  labels:
+    team: developers
+    environment: dev
+---
+# ClusterRole for basic pod operations
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: developer-role
+rules:
+# Core resources permissions
+- apiGroups: [""]
+  resources: ["pods", "pods/log", "pods/exec"]
+  verbs: ["get", "list", "watch", "create", "delete"]
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+# Apps resources permissions
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+# Networking permissions
+- apiGroups: ["networking.k8s.io"]
+  resources: ["networkpolicies"]
+  verbs: ["get", "list", "watch"]
+---
+# RoleBinding to bind developers to their namespace
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: development
+  name: developer-binding
+subjects:
+- kind: User
+  name: developer1
+  apiGroup: rbac.authorization.k8s.io
+- kind: User
+  name: developer2
+  apiGroup: rbac.authorization.k8s.io
+- kind: Group
+  name: developers
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: developer-role
+  apiGroup: rbac.authorization.k8s.io
+```
+
+---
+
+## Example 2: ServiceAccount for Application Pods
+
+```yaml
+# ServiceAccount for application pods
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: app-service-account
+  namespace: development
+  labels:
+    app: web-application
+---
+# Role for application-specific permissions
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: development
+  name: app-role
+rules:
+# Allow reading own pod information
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+# Allow reading configuration
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames: ["app-config", "app-features"]
+  verbs: ["get", "watch"]
+# Allow reading secrets (limited)
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames: ["app-secrets"]
+  verbs: ["get"]
+---
+# RoleBinding for ServiceAccount
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: app-role-binding
+  namespace: development
+subjects:
+- kind: ServiceAccount
+  name: app-service-account
+  namespace: development
+roleRef:
+  kind: Role
+  name: app-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# Pod using the ServiceAccount
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-app
+  namespace: development
+  labels:
+    app: web-application
+spec:
+  serviceAccountName: app-service-account
+  containers:
+  - name: web-app
+    image: nginx:1.21
+    ports:
+    - containerPort: 80
+    # Security context (Defense in Depth)
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop:
+        - ALL
+    volumeMounts:
+    - name: tmp-volume
+      mountPath: /tmp
+    - name: cache-volume
+      mountPath: /var/cache/nginx
+  volumes:
+  - name: tmp-volume
+    emptyDir: {}
+  - name: cache-volume
+    emptyDir: {}
+  # Automatic ServiceAccount token mounting
+  automountServiceAccountToken: true
+```
+
+---
+
+## Example 3: ReadOnly Cluster Access for Monitoring
+
+```yaml
+# ClusterRole for monitoring/observability
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: monitoring-reader
+rules:
+# Node and cluster-level metrics
+- apiGroups: [""]
+  resources: ["nodes", "nodes/metrics", "nodes/stats"]
+  verbs: ["get", "list"]
+# Pod and container metrics
+- apiGroups: [""]
+  resources: ["pods", "pods/status"]
+  verbs: ["get", "list"]
+# Application metrics
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets", "daemonsets"]
+  verbs: ["get", "list"]
+# Service discovery
+- apiGroups: [""]
+  resources: ["services", "endpoints"]
+  verbs: ["get", "list"]
+# Custom metrics (if using custom metrics API)
+- apiGroups: ["metrics.k8s.io"]
+  resources: ["*"]
+  verbs: ["get", "list"]
+---
+# ServiceAccount for monitoring system
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: monitoring-service-account
+  namespace: kube-system
+---
+# ClusterRoleBinding for monitoring
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: monitoring-cluster-reader
+subjects:
+- kind: ServiceAccount
+  name: monitoring-service-account
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: monitoring-reader
+  apiGroup: rbac.authorization.k8s.io
+```
+
+---
+
+## Example 4: NetworkPolicy Integration (Defense in Depth)
+
+```yaml
+# NetworkPolicy complementing RBAC (layered security)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: development-network-policy
+  namespace: development
+spec:
+  podSelector:
+    matchLabels:
+      app: web-application
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow traffic from other pods in same namespace
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: development
+    ports:
+    - protocol: TCP
+      port: 80
+  # Allow traffic from monitoring namespace
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 8080  # metrics endpoint
+  egress:
+  # Allow DNS resolution
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+  # Allow HTTPS to external APIs
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+```
+
+---
+
+## Example 5: Advanced RBAC with Resource Names
+
+```yaml
+# Fine-grained permissions using resourceNames
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: development
+  name: config-manager-role
+rules:
+# Allow managing specific ConfigMaps only
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames: ["app-config", "feature-flags", "environment-config"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+# Allow reading all ConfigMaps (for discovery)
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["list"]
+# Allow managing specific Secrets
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames: ["app-database-secret", "app-api-keys"]
+  verbs: ["get", "create", "update", "patch"]
+# Deny access to sensitive secrets (implicit - not listed)
+---
+# RoleBinding for config management
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: config-manager-binding
+  namespace: development
+subjects:
+- kind: User
+  name: config-admin
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: config-manager-role
+  apiGroup: rbac.authorization.k8s.io
+```
+
+---
+
+## Testing RBAC Configuration
+
+```bash
+# Test user permissions
+kubectl auth can-i create pods --as=developer1 --namespace=development
+kubectl auth can-i delete secrets --as=developer1 --namespace=development
+
+# Test ServiceAccount permissions
+kubectl auth can-i get pods --as=system:serviceaccount:development:app-service-account
+
+# Verbose testing with reasons
+kubectl auth can-i "*" "*" --as=developer1 --namespace=development
+
+# Check effective permissions
+kubectl describe role developer-role --namespace=development
+kubectl describe rolebinding developer-binding --namespace=development
+```
+
+---
+
+## Production Notes
+
+1. **Principle of Least Privilege**: Always grant minimum required permissions
+2. **Regular Audits**: Review and rotate permissions regularly
+3. **ServiceAccount Management**: Use unique ServiceAccounts per application
+4. **Secret Management**: Prefer external secret management systems in production
+5. **Monitoring**: Log and monitor RBAC denials for security analysis
+
+## Common Issues
+
+- **Permission Denied**: Check RoleBinding subjects and Role rules
+- **Wrong Namespace**: Ensure RoleBinding is in correct namespace
+- **ClusterRole vs Role**: Use ClusterRole for cluster-wide resources
+- **Resource Names**: Be precise with resourceNames restrictions
+
+## Architecture Integration
+
+This RBAC configuration implements the **Authorization** layer in the Kubernetes security architecture as detailed in the [main architecture guide](../kubernetes-architecture-deep-dive.md#security-architecture). It works together with:
+
+- **Authentication** (who you are)
+- **Admission Controllers** (policy enforcement) 
+- **Network Policies** (network-level security)
+- **Pod Security Standards** (container security)
