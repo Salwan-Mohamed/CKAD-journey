@@ -1,0 +1,541 @@
+# Multi-Container Pod Design Patterns
+
+## Purpose
+Demonstrates advanced Kubernetes architectural patterns using multi-container pods as covered in the [Architecture Deep Dive](../kubernetes-architecture-deep-dive.md#advanced-architectural-patterns).
+
+## CKAD Relevance
+- **Multi-Container Pods**: 20% of CKAD exam
+- **Pod Design Patterns**: Essential for real-world applications
+- **Volume Sharing**: Understanding shared storage between containers
+
+---
+
+## Pattern 1: Sidecar Pattern - Logging Agent
+
+```yaml
+# Sidecar pattern: Main application with logging sidecar
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app-with-logging
+  namespace: development
+  labels:
+    app: web-application
+    pattern: sidecar
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web-application
+  template:
+    metadata:
+      labels:
+        app: web-application
+        pattern: sidecar
+    spec:
+      # Shared volumes between containers
+      volumes:
+      - name: shared-logs
+        emptyDir: {}
+      - name: app-config
+        configMap:
+          name: web-app-config
+      
+      containers:
+      # Main application container
+      - name: web-app
+        image: nginx:1.21
+        ports:
+        - containerPort: 80
+          name: http
+        volumeMounts:
+        - name: shared-logs
+          mountPath: /var/log/nginx
+        - name: app-config
+          mountPath: /etc/nginx/conf.d
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        # Health checks
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      
+      # Sidecar logging container
+      - name: log-shipper
+        image: fluent/fluent-bit:1.9
+        env:
+        - name: FLUENT_CONF
+          value: fluent-bit.conf
+        - name: FLUENT_OPT
+          value: "--verbose"
+        volumeMounts:
+        - name: shared-logs
+          mountPath: /var/log/nginx
+          readOnly: true
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+---
+# ConfigMap for web application
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-app-config
+  namespace: development
+data:
+  default.conf: |
+    server {
+        listen 80;
+        server_name localhost;
+        
+        # Custom log format
+        log_format detailed '$remote_addr - $remote_user [$time_local] '
+                           '"$request" $status $body_bytes_sent '
+                           '"$http_referer" "$http_user_agent"';
+        
+        access_log /var/log/nginx/access.log detailed;
+        error_log /var/log/nginx/error.log warn;
+        
+        location / {
+            root /usr/share/nginx/html;
+            index index.html;
+        }
+        
+        location /health {
+            return 200 "healthy\n";
+            add_header Content-Type text/plain;
+        }
+        
+        location /ready {
+            return 200 "ready\n";
+            add_header Content-Type text/plain;
+        }
+    }
+```
+
+---
+
+## Pattern 2: Ambassador Pattern - Redis Proxy
+
+```yaml
+# Ambassador pattern: Application with Redis proxy
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-with-redis-ambassador
+  namespace: development
+  labels:
+    app: web-application
+    pattern: ambassador
+spec:
+  containers:
+  # Main application container
+  - name: web-app
+    image: node:16-alpine
+    ports:
+    - containerPort: 3000
+    env:
+    - name: REDIS_HOST
+      value: "localhost"  # Ambassador proxy on localhost
+    - name: REDIS_PORT
+      value: "6379"
+    command: ["node"]
+    args: ["app.js"]
+    volumeMounts:
+    - name: app-source
+      mountPath: /app
+    workingDir: /app
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 300m
+        memory: 256Mi
+  
+  # Ambassador (proxy) container
+  - name: redis-ambassador
+    image: haproxy:2.4
+    ports:
+    - containerPort: 6379
+    env:
+    - name: REDIS_MASTER_HOST
+      value: "redis-master.database.svc.cluster.local"
+    - name: REDIS_REPLICA_HOST
+      value: "redis-replica.database.svc.cluster.local"
+    volumeMounts:
+    - name: haproxy-config
+      mountPath: /usr/local/etc/haproxy
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+  
+  volumes:
+  - name: app-source
+    configMap:
+      name: app-source-code
+  - name: haproxy-config
+    configMap:
+      name: redis-ambassador-config
+---
+# HAProxy configuration for Redis ambassador
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-ambassador-config
+  namespace: development
+data:
+  haproxy.cfg: |
+    global
+        daemon
+        maxconn 256
+    
+    defaults
+        mode tcp
+        timeout connect 5000ms
+        timeout client 50000ms
+        timeout server 50000ms
+    
+    # Redis read/write splitting
+    frontend redis_frontend
+        bind *:6379
+        # Route writes to master, reads to replicas
+        acl is_write_cmd req.payload(0,0),regsub("[\r\n].*","") -m reg -i "^[A-Z]*\s*(SET|DEL|INCR|DECR|LPUSH|RPUSH|SADD|ZADD|HSET|HDEL)"
+        use_backend redis_master if is_write_cmd
+        default_backend redis_replica
+    
+    backend redis_master
+        server redis-master redis-master.database.svc.cluster.local:6379 check
+    
+    backend redis_replica
+        balance roundrobin
+        server redis-replica-1 redis-replica.database.svc.cluster.local:6379 check
+        server redis-replica-2 redis-replica.database.svc.cluster.local:6380 check
+```
+
+---
+
+## Pattern 3: Adapter Pattern - Metrics Conversion
+
+```yaml
+# Adapter pattern: Legacy app with Prometheus metrics adapter
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: legacy-app-with-adapter
+  namespace: development
+  labels:
+    app: legacy-application
+    pattern: adapter
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: legacy-application
+  template:
+    metadata:
+      labels:
+        app: legacy-application
+        pattern: adapter
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      # Legacy application (produces custom metrics format)
+      - name: legacy-app
+        image: legacy-app:v1.0
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 8888
+          name: admin
+        env:
+        - name: METRICS_ENDPOINT
+          value: "/admin/stats"
+        - name: METRICS_FORMAT
+          value: "custom"
+        volumeMounts:
+        - name: metrics-data
+          mountPath: /tmp/metrics
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+      
+      # Adapter container (converts to Prometheus format)
+      - name: metrics-adapter
+        image: prom/node-exporter:v1.3.1
+        ports:
+        - containerPort: 9090
+          name: metrics
+        args:
+        - '--path.procfs=/host/proc'
+        - '--path.sysfs=/host/sys'
+        - '--collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+)($|/)'
+        - '--collector.textfile.directory=/tmp/metrics'
+        volumeMounts:
+        - name: metrics-data
+          mountPath: /tmp/metrics
+          readOnly: true
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+      
+      # Metrics converter sidecar
+      - name: metrics-converter
+        image: busybox:1.35
+        command: ["/bin/sh"]
+        args:
+        - -c
+        - |
+          while true; do
+            # Fetch custom metrics from legacy app
+            wget -q -O - http://localhost:8888/admin/stats | \
+            # Convert to Prometheus format
+            awk '/^requests_total/ { print "legacy_" $0 ".prom" }
+                 /^response_time/ { print "legacy_" $0 ".prom" }
+                 /^errors_total/ { print "legacy_" $0 ".prom" }' > /tmp/metrics/legacy_app.prom
+            sleep 30
+          done
+        volumeMounts:
+        - name: metrics-data
+          mountPath: /tmp/metrics
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            cpu: 50m
+            memory: 64Mi
+      
+      volumes:
+      - name: metrics-data
+        emptyDir: {}
+```
+
+---
+
+## Pattern 4: Init Container Pattern - Database Migration
+
+```yaml
+# Init containers for application setup
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app-with-init
+  namespace: development
+  labels:
+    app: web-application
+    pattern: init-container
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-application
+  template:
+    metadata:
+      labels:
+        app: web-application
+        pattern: init-container
+    spec:
+      # Init containers run before main containers
+      initContainers:
+      # Database migration init container
+      - name: db-migration
+        image: migrate/migrate:v4.15.2
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: database-credentials
+              key: connection-string
+        command: ['migrate']
+        args: ['-path', '/migrations', '-database', '$(DATABASE_URL)', 'up']
+        volumeMounts:
+        - name: migration-scripts
+          mountPath: /migrations
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+      
+      # Cache warming init container
+      - name: cache-warmer
+        image: redis:7-alpine
+        env:
+        - name: REDIS_HOST
+          value: "redis.database.svc.cluster.local"
+        - name: REDIS_PORT
+          value: "6379"
+        command: ["/bin/sh"]
+        args:
+        - -c
+        - |
+          # Wait for Redis to be ready
+          until redis-cli -h $REDIS_HOST -p $REDIS_PORT ping; do
+            echo "Waiting for Redis..."
+            sleep 2
+          done
+          # Pre-populate cache with essential data
+          redis-cli -h $REDIS_HOST -p $REDIS_PORT SET app:initialized "true"
+          redis-cli -h $REDIS_HOST -p $REDIS_PORT SETEX app:config 3600 "$(cat /config/app-config.json)"
+          echo "Cache warmed successfully"
+        volumeMounts:
+        - name: app-config
+          mountPath: /config
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+      
+      containers:
+      # Main application container
+      - name: web-app
+        image: web-app:v2.0
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: database-credentials
+              key: connection-string
+        - name: REDIS_HOST
+          value: "redis.database.svc.cluster.local"
+        volumeMounts:
+        - name: app-config
+          mountPath: /etc/config
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        # Application won't start until init containers complete
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      
+      volumes:
+      - name: migration-scripts
+        configMap:
+          name: database-migrations
+      - name: app-config
+        configMap:
+          name: application-config
+      
+      # Restart policy affects both init and main containers
+      restartPolicy: Always
+```
+
+---
+
+## Testing Multi-Container Patterns
+
+```bash
+# Check pod status and container readiness
+kubectl get pods -l pattern=sidecar -w
+
+# Inspect container logs
+kubectl logs web-app-with-logging-xxx -c web-app
+kubectl logs web-app-with-logging-xxx -c log-shipper
+
+# Execute commands in specific containers
+kubectl exec -it app-with-redis-ambassador -c web-app -- /bin/sh
+kubectl exec -it app-with-redis-ambassador -c redis-ambassador -- haproxy -f /usr/local/etc/haproxy/haproxy.cfg -c
+
+# Check resource utilization per container
+kubectl top pods --containers
+
+# Describe pod to see init container execution
+kubectl describe pod web-app-with-init-xxx
+```
+
+---
+
+## Production Considerations
+
+### Resource Management
+- **CPU/Memory Limits**: Set appropriate limits for each container
+- **Resource Sharing**: Monitor total pod resource consumption
+- **Init Container Resources**: Size init containers appropriately for startup time
+
+### Security
+- **Principle of Least Privilege**: Each container should have minimal required permissions
+- **Network Policies**: Control inter-container communication
+- **Security Contexts**: Apply appropriate security contexts per container
+
+### Monitoring
+- **Per-Container Metrics**: Monitor each container individually
+- **Shared Volume Monitoring**: Watch shared volume usage
+- **Health Checks**: Implement health checks for all containers
+
+### Troubleshooting
+- **Container Dependencies**: Understand startup order and dependencies
+- **Shared Resources**: Debug issues with shared volumes and networks
+- **Init Container Failures**: Handle init container failure scenarios
+
+## Architecture Integration
+
+These multi-container patterns implement the distributed systems design patterns covered in the [Kubernetes Architecture Deep Dive](../kubernetes-architecture-deep-dive.md). They demonstrate:
+
+- **Separation of Concerns**: Each container has a specific responsibility
+- **Shared Resources**: Efficient use of pod-level networking and storage
+- **Lifecycle Management**: Proper initialization and shutdown sequences
+- **Scalability**: Patterns that work at scale in production environments
+
+## CKAD Exam Tips
+
+1. **Understand Container Communication**: Know how containers in a pod share network and storage
+2. **Volume Types**: Practice with emptyDir, configMap, and secret volumes
+3. **Init Container Behavior**: Understand that init containers run to completion before main containers start
+4. **Resource Allocation**: Know how to set resources per container
+5. **Debugging**: Practice using `kubectl logs`, `kubectl exec`, and `kubectl describe` with multi-container pods
