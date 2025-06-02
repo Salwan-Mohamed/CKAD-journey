@@ -1,0 +1,123 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font-family: Arial, sans-serif; font-size: 24px; font-weight: bold; text-anchor: middle; }
+      .label { font-family: Arial, sans-serif; font-size: 14px; text-anchor: middle; }
+      .small-label { font-family: Arial, sans-serif; font-size: 12px; text-anchor: middle; }
+      .control-plane { fill: #e3f2fd; stroke: #1976d2; stroke-width: 2; }
+      .worker-node { fill: #f1f8e9; stroke: #388e3c; stroke-width: 2; }
+      .component { fill: white; stroke: #666; stroke-width: 1; }
+      .client { fill: #fff3e0; stroke: #f57c00; stroke-width: 2; }
+    </style>
+  </defs>
+  
+  <!-- Title -->
+  <text x="400" y="30" class="title">High-Level Kubernetes Cluster Architecture</text>
+  
+  <!-- External Clients -->
+  <g id="clients">
+    <circle cx="80" cy="120" r="15" class="client"/>
+    <circle cx="80" cy="160" r="15" class="client"/>
+    <circle cx="80" cy="200" r="15" class="client"/>
+    <text x="80" y="125" class="small-label">👤</text>
+    <text x="80" y="165" class="small-label">👤</text>
+    <text x="80" y="205" class="small-label">👤</text>
+    <text x="80" y="235" class="label">External</text>
+    <text x="80" y="250" class="label">clients</text>
+    <text x="80" y="265" class="small-label">Developers</text>
+    <text x="80" y="280" class="small-label">CI/CD</text>
+    <text x="80" y="295" class="small-label">kubectl</text>
+  </g>
+  
+  <!-- HTTPS Connection -->
+  <line x1="120" y1="160" x2="200" y2="160" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="160" y="150" class="small-label">HTTPS</text>
+  
+  <!-- Control Plane -->
+  <rect x="220" y="80" width="300" height="180" class="control-plane" rx="10"/>
+  <text x="370" y="105" class="label" fill="#1976d2">Control Plane</text>
+  
+  <!-- API Server -->
+  <rect x="240" y="120" width="80" height="50" class="component" rx="5"/>
+  <text x="280" y="135" class="small-label">🏢</text>
+  <text x="280" y="150" class="small-label">API</text>
+  <text x="280" y="165" class="small-label">Server</text>
+  
+  <!-- etcd -->
+  <rect x="360" y="120" width="60" height="50" class="component" rx="5"/>
+  <text x="390" y="135" class="small-label">🗄️</text>
+  <text x="390" y="150" class="small-label">etcd</text>
+  
+  <!-- Scheduler -->
+  <rect x="240" y="190" width="80" height="50" class="component" rx="5"/>
+  <text x="280" y="205" class="small-label">⏰</text>
+  <text x="280" y="220" class="small-label">Scheduler</text>
+  
+  <!-- Controller Manager -->
+  <rect x="360" y="190" width="80" height="50" class="component" rx="5"/>
+  <text x="400" y="205" class="small-label">⚙️</text>
+  <text x="400" y="220" class="small-label">Controller</text>
+  <text x="400" y="235" class="small-label">Manager</text>
+  
+  <!-- Worker Nodes Section -->
+  <text x="400" y="300" class="label">Network</text>
+  <line x1="200" y1="320" x2="600" y2="320" stroke="#333" stroke-width="1"/>
+  
+  <!-- Worker Node 1 -->
+  <rect x="120" y="350" width="140" height="200" class="worker-node" rx="10"/>
+  <text x="190" y="375" class="label" fill="#388e3c">Worker Node</text>
+  
+  <rect x="140" y="390" width="100" height="30" class="component" rx="3"/>
+  <text x="190" y="408" class="small-label">🔧 kubelet</text>
+  
+  <rect x="140" y="430" width="100" height="30" class="component" rx="3"/>
+  <text x="190" y="448" class="small-label">🌐 kube-proxy</text>
+  
+  <rect x="140" y="470" width="100" height="50" class="component" rx="3"/>
+  <text x="190" y="488" class="small-label">Pod</text>
+  <rect x="155" y="495" width="70" height="20" fill="#f0f0f0" stroke="#999" rx="2"/>
+  <text x="190" y="508" class="small-label">📦 Container</text>
+  
+  <!-- Worker Node 2 -->
+  <rect x="280" y="350" width="140" height="200" class="worker-node" rx="10"/>
+  <text x="350" y="375" class="label" fill="#388e3c">Worker Node</text>
+  
+  <rect x="300" y="390" width="100" height="30" class="component" rx="3"/>
+  <text x="350" y="408" class="small-label">🔧 kubelet</text>
+  
+  <rect x="300" y="430" width="100" height="30" class="component" rx="3"/>
+  <text x="350" y="448" class="small-label">🌐 kube-proxy</text>
+  
+  <rect x="300" y="470" width="100" height="50" class="component" rx="3"/>
+  <text x="350" y="488" class="small-label">Container</text>
+  <rect x="315" y="495" width="70" height="20" fill="#f0f0f0" stroke="#999" rx="2"/>
+  <text x="350" y="508" class="small-label">📦 Container</text>
+  
+  <!-- Worker Node 3 -->
+  <rect x="440" y="350" width="140" height="200" class="worker-node" rx="10"/>
+  <text x="510" y="375" class="label" fill="#388e3c">Worker Nodes</text>
+  
+  <rect x="460" y="390" width="100" height="30" class="component" rx="3"/>
+  <text x="510" y="408" class="small-label">🔧 kube-proxy</text>
+  
+  <rect x="460" y="430" width="100" height="50" class="component" rx="3"/>
+  <text x="510" y="448" class="small-label">Container</text>
+  <rect x="475" y="455" width="70" height="20" fill="#f0f0f0" stroke="#999" rx="2"/>
+  <text x="510" y="468" class="small-label">📦 Container</text>
+  
+  <!-- Connection Lines -->
+  <line x1="370" y1="270" x2="190" y2="340" stroke="#333" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="370" y1="270" x2="350" y2="340" stroke="#333" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="370" y1="270" x2="510" y2="340" stroke="#333" stroke-width="1" stroke-dasharray="5,5"/>
+  
+  <!-- Bidirectional arrow between Control Plane and Worker Nodes -->
+  <line x1="480" y1="160" x2="580" y2="160" stroke="#333" stroke-width="2"/>
+  <line x1="580" y1="160" x2="580" y2="430" stroke="#333" stroke-width="2"/>
+  <line x1="580" y1="430" x2="570" y2="430" stroke="#333" stroke-width="2"/>
+  
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+  </defs>
+</svg>
