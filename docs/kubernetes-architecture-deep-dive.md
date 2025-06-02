@@ -29,7 +29,9 @@
 
 In the rapidly evolving landscape of cloud-native technologies, Kubernetes has emerged as the de facto standard for container orchestration. Yet, beneath its seemingly straightforward premise of "managing containers at scale" lies a sophisticated architectural masterpiece that embodies decades of distributed systems research and real-world operational wisdom.
 
-![High-Level Kubernetes Cluster Architecture](./images/k8s-high-level-architecture.png)
+<div align="center">
+<img src="https://raw.githubusercontent.com/Salwan-Mohamed/CKAD-journey/main/docs/images/k8s-high-level-architecture.svg" alt="High-Level Kubernetes Cluster Architecture" width="800"/>
+</div>
 
 As platform engineers and DevOps practitioners, understanding Kubernetes architecture isn't just about deploying applications—it's about comprehending the foundational principles that enable reliable, scalable, and maintainable distributed systems. This deep dive will explore the architectural decisions, design patterns, and implementation details that make Kubernetes the powerful platform it is today.
 
@@ -58,7 +60,9 @@ A Kubernetes cluster fundamentally consists of two types of nodes:
 
 The control plane serves as the cluster's command center, making global decisions about the cluster and detecting and responding to cluster events. In production environments, the control plane typically runs across multiple nodes for high availability.
 
-![Control Plane Architecture](./images/control-plane-components.png)
+<div align="center">
+<img src="https://raw.githubusercontent.com/Salwan-Mohamed/CKAD-journey/main/docs/images/control-plane-components.svg" alt="Control Plane Architecture" width="800"/>
+</div>
 
 ### Worker Nodes: The Execution Engine
 
@@ -83,7 +87,9 @@ GET /api/v1/namespaces/production/pods?watch=true  // Watch for changes
 POST /api/v1/namespaces/production/pods           // Create new pod
 ```
 
-![API Request Flow](./images/api-request-flow.png)
+<div align="center">
+<img src="https://raw.githubusercontent.com/Salwan-Mohamed/CKAD-journey/main/docs/images/api-request-flow.svg" alt="API Request Flow" width="700"/>
+</div>
 
 ### etcd: The Source of Truth
 
@@ -119,7 +125,9 @@ The **kube-scheduler** makes one of the most complex decisions in Kubernetes: wh
 - **Policy Constraints**: Priority classes, resource quotas
 - **Data Locality**: Considering storage and network proximity
 
-![Scheduling Decision Process](./images/scheduler-process.png)
+<div align="center">
+<img src="https://raw.githubusercontent.com/Salwan-Mohamed/CKAD-journey/main/docs/images/scheduler-process.svg" alt="Scheduling Decision Process" width="700"/>
+</div>
 
 ```yaml
 # Advanced scheduling example
@@ -156,7 +164,9 @@ spec:
 - **Service Controller**: Maintains service endpoints and load balancer state
 - **Node Controller**: Monitors node health and manages node lifecycle
 
-![Controller Reconciliation Loop](./images/controller-reconciliation.png)
+<div align="center">
+<img src="https://raw.githubusercontent.com/Salwan-Mohamed/CKAD-journey/main/docs/images/controller-reconciliation.svg" alt="Controller Reconciliation Loop" width="600"/>
+</div>
 
 ```go
 // Simplified controller pattern
@@ -182,8 +192,6 @@ The **kubelet** serves as Kubernetes' representative on each worker node, respon
 - **Health Monitoring**: Running liveness, readiness, and startup probes
 - **Volume Management**: Mounting and unmounting storage volumes
 
-![kubelet Interactions](./images/kubelet-interactions.png)
-
 ### kube-proxy: Network Traffic Director
 
 **kube-proxy** implements Kubernetes networking rules on each node, enabling service discovery and load balancing:
@@ -203,8 +211,6 @@ The **kubelet** serves as Kubernetes' representative on each worker node, respon
 ### Container Runtime: The Execution Layer
 
 Modern Kubernetes supports multiple container runtimes through the **Container Runtime Interface (CRI)**:
-
-![CRI Architecture](./images/cri-architecture.png)
 
 **Runtime Options:**
 - **containerd**: Default runtime, lightweight and efficient
@@ -243,8 +249,6 @@ Proxy external services through local containers:
   ports:
   - containerPort: 6379
 ```
-
-![Pod Design Patterns](./images/pod-design-patterns.png)
 
 #### Circuit Breaker and Retry Patterns
 Implemented through service mesh integration or application-level logic.
@@ -290,8 +294,6 @@ spec:
 
 Kubernetes organizes its APIs into logical groups with independent versioning:
 
-![API Group Organization](./images/api-groups.png)
-
 **Core API Groups:**
 - **Core (v1)**: Pods, Services, ConfigMaps, Secrets
 - **apps/v1**: Deployments, ReplicaSets, DaemonSets
@@ -321,8 +323,6 @@ kubectl get nodes,namespaces,clusterroles
 ### The Container Runtime Interface (CRI)
 
 The CRI represents a crucial architectural decision that enables runtime pluggability:
-
-![CRI Interface Details](./images/cri-interface.png)
 
 **CRI Services:**
 ```protobuf
@@ -358,8 +358,6 @@ service ImageService {
 ## High Availability and Scalability Patterns
 
 ### Control Plane HA Architecture
-
-![HA Control Plane](./images/ha-control-plane.png)
 
 ```yaml
 # Example HA configuration considerations
@@ -406,8 +404,6 @@ controller-manager:
 ### Defense in Depth
 
 Kubernetes implements multiple security layers:
-
-![Security Defense Layers](./images/security-layers.png)
 
 **Authentication Methods:**
 - **X.509 Client Certificates**: For kubelet and admin access
@@ -477,8 +473,6 @@ webhooks:
 
 Kubernetes delegates networking to CNI plugins, enabling flexible network architectures:
 
-![CNI Architecture](./images/cni-architecture.png)
-
 **CNI Plugin Categories:**
 - **Overlay Networks**: Flannel, Weave, Calico (IPIP mode)
 - **Routed Networks**: Calico (BGP mode), Cilium
@@ -512,8 +506,6 @@ spec:
 ### Persistent Volume Subsystem
 
 Kubernetes abstracts storage through a sophisticated subsystem:
-
-![Storage Architecture](./images/storage-architecture.png)
 
 **Storage Classes and Dynamic Provisioning:**
 ```yaml
@@ -560,8 +552,6 @@ Kubernetes provides extensive observability through multiple channels:
 - **kubelet**: Node and pod metrics
 - **kube-state-metrics**: Kubernetes object state metrics
 - **Metrics Server**: Resource utilization APIs
-
-![Monitoring Architecture](./images/monitoring-architecture.png)
 
 ```yaml
 # HorizontalPodAutoscaler using custom metrics
@@ -634,8 +624,6 @@ spec:
     singular: database
     kind: Database
 ```
-
-![Operator Pattern](./images/operator-pattern.png)
 
 ## Future Architecture Considerations
 
@@ -748,8 +736,6 @@ The architectural patterns we've explored—from the declarative API model to th
 
 As we look toward the future, Kubernetes will continue to evolve, incorporating new technologies like WebAssembly, edge computing capabilities, and deeper AI/ML integration. The architectural principles we've explored will serve as the foundation for these innovations, ensuring that Kubernetes remains the backbone of cloud-native computing for years to come.
 
-![Kubernetes Evolution Timeline](./images/k8s-evolution-timeline.png)
-
 ---
 
 *Continue your Kubernetes journey by exploring advanced topics like custom operators, multi-cluster management, and specialized workload patterns. The architecture we've examined today provides the foundation for understanding these more complex scenarios and designing robust, scalable platforms for the future.*
@@ -759,3 +745,23 @@ As we look toward the future, Kubernetes will continue to evolve, incorporating 
 ---
 
 **About the Author:** Platform engineering expertise focusing on Kubernetes architecture, distributed systems design, and cloud-native infrastructure patterns.
+
+## Visual Architecture Diagrams
+
+For better understanding of the concepts covered in this guide, refer to the following architectural diagrams:
+
+- [High-Level Cluster Architecture](./images/k8s-high-level-architecture.svg)
+- [Control Plane Components](./images/control-plane-components.svg)
+- [API Request Flow](./images/api-request-flow.svg)
+- [Scheduler Process](./images/scheduler-process.svg)
+- [Controller Reconciliation](./images/controller-reconciliation.svg)
+
+## Practical Examples
+
+For hands-on implementation of these architectural concepts:
+
+- [RBAC Security Examples](./examples/rbac-examples.yaml)
+- [Multi-Container Patterns](./examples/multi-container-patterns.yaml)
+- [Network Policy Examples](./examples/network-policy-examples.yaml)
+- [Monitoring Configuration](./examples/monitoring-config.yaml)
+- [Quick Reference Guide](./kubernetes-quick-reference.md)
