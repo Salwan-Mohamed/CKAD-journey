@@ -1,0 +1,100 @@
+<svg width="700" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font-family: Arial, sans-serif; font-size: 20px; font-weight: bold; text-anchor: middle; }
+      .label { font-family: Arial, sans-serif; font-size: 14px; text-anchor: middle; }
+      .small-label { font-family: Arial, sans-serif; font-size: 12px; text-anchor: middle; }
+      .stage { fill: white; stroke: #333; stroke-width: 2; }
+      .client { fill: #e3f2fd; stroke: #1976d2; stroke-width: 2; }
+      .auth { fill: #e8f5e8; stroke: #4caf50; stroke-width: 2; }
+      .authz { fill: #fff3e0; stroke: #ff9800; stroke-width: 2; }
+      .admission { fill: #f3e5f5; stroke: #9c27b0; stroke-width: 2; }
+      .validation { fill: #ffebee; stroke: #f44336; stroke-width: 2; }
+      .storage { fill: #e0f2f1; stroke: #009688; stroke-width: 2; }
+      .connection { stroke: #333; stroke-width: 2; fill: none; }
+      .error-path { stroke: #f44336; stroke-width: 2; fill: none; stroke-dasharray: 5,5; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+    <marker id="error-arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#f44336"/>
+    </marker>
+  </defs>
+  
+  <!-- Title -->
+  <text x="350" y="25" class="title">Kubernetes API Request Flow</text>
+  
+  <!-- Client Request -->
+  <rect x="250" y="50" width="200" height="40" class="client" rx="20"/>
+  <text x="350" y="65" class="label">Client request</text>
+  <text x="350" y="80" class="small-label">(kubectl, app, etc.)</text>
+  
+  <!-- Flow annotation -->
+  <text x="450" y="115" class="small-label">X.509 certs,</text>
+  <text x="450" y="127" class="small-label">OIDC tokens</text>
+  
+  <!-- Authentication -->
+  <rect x="250" y="130" width="200" height="40" class="auth" rx="20"/>
+  <text x="350" y="155" class="label">Authentication</text>
+  
+  <!-- Flow annotation -->
+  <text x="450" y="190" class="small-label">RBAC, ABAC</text>
+  
+  <!-- Authorization -->
+  <rect x="250" y="210" width="200" height="40" class="auth" rx="20"/>
+  <text x="350" y="235" class="label">Authorization</text>
+  
+  <!-- Admission Controllers -->
+  <rect x="250" y="290" width="200" height="40" class="admission" rx="20"/>
+  <text x="350" y="305" class="label">Admission</text>
+  <text x="350" y="320" class="label">Controllers</text>
+  
+  <!-- Validation -->
+  <rect x="250" y="370" width="200" height="40" class="validation" rx="20"/>
+  <text x="350" y="395" class="label">Validation</text>
+  
+  <!-- etcd Storage -->
+  <rect x="250" y="450" width="200" height="40" class="storage" rx="20"/>
+  <text x="350" y="475" class="label">etcd Storage</text>
+  
+  <!-- Success path arrows -->
+  <line x1="350" y1="90" x2="350" y2="130" class="connection" marker-end="url(#arrow)"/>
+  <line x1="350" y1="170" x2="350" y2="210" class="connection" marker-end="url(#arrow)"/>
+  <line x1="350" y1="250" x2="350" y2="290" class="connection" marker-end="url(#arrow)"/>
+  <line x1="350" y1="330" x2="350" y2="370" class="connection" marker-end="url(#arrow)"/>
+  <line x1="350" y1="410" x2="350" y2="450" class="connection" marker-end="url(#arrow)"/>
+  <text x="365" y="430" class="small-label">Success</text>
+  
+  <!-- Error paths -->
+  <line x1="450" y1="150" x2="550" y2="150" class="error-path" marker-end="url(#error-arrow)"/>
+  <text x="580" y="155" class="small-label">Error</text>
+  
+  <line x1="450" y1="230" x2="550" y2="230" class="error-path" marker-end="url(#error-arrow)"/>
+  
+  <line x1="450" y1="310" x2="550" y2="310" class="error-path"/>
+  <text x="520" y="325" class="small-label">Rejection</text>
+  
+  <line x1="450" y1="390" x2="550" y2="390" class="error-path" marker-end="url(#error-arrow)"/>
+  <text x="580" y="395" class="small-label">Rejection</text>
+  
+  <!-- Error box -->
+  <rect x="550" y="140" width="80" height="280" fill="#ffebee" stroke="#f44336" stroke-width="2" rx="10"/>
+  <text x="590" y="165" class="label" fill="#f44336">Error</text>
+  <text x="590" y="185" class="label" fill="#f44336">Response</text>
+  
+  <!-- Stage descriptions on the left -->
+  <text x="50" y="155" class="small-label">Who are you?</text>
+  <text x="50" y="235" class="small-label">What can you do?</text>
+  <text x="50" y="315" class="small-label">Policy enforcement</text>
+  <text x="50" y="395" class="small-label">Schema validation</text>
+  <text x="50" y="475" class="small-label">Persistent state</text>
+  
+  <!-- Success response path -->
+  <line x1="350" y1="490" x2="350" y2="530" class="connection"/>
+  <line x1="350" y1="530" x2="250" y2="530" class="connection"/>
+  <line x1="250" y1="530" x2="250" y2="90" class="connection"/>
+  <line x1="250" y1="90" x2="240" y2="90" class="connection" marker-end="url(#arrow)"/>
+  <text x="200" y="95" class="small-label">Success</text>
+  <text x="200" y="107" class="small-label">Response</text>
+</svg>
