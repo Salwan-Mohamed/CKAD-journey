@@ -1,0 +1,630 @@
+# Network Policy Examples - CNI Architecture Implementation
+
+## Purpose
+Demonstrates Kubernetes networking architecture through practical Network Policy configurations that implement the Container Network Interface (CNI) concepts covered in the [Architecture Deep Dive](../kubernetes-architecture-deep-dive.md#networking-architecture-deep-dive).
+
+## CKAD Relevance
+- **Services and Networking**: 20% of CKAD exam
+- **Network Policies**: Essential for microservices security
+- **Pod Communication**: Understanding network segmentation
+
+---
+
+## Example 1: Default Deny All Traffic
+
+```yaml
+# Default deny-all policy (security baseline)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: production
+  labels:
+    policy-type: baseline-security
+spec:
+  podSelector: {}  # Applies to all pods in namespace
+  policyTypes:
+  - Ingress
+  - Egress
+  # No ingress/egress rules = deny all traffic
+---
+# Allow DNS resolution (essential for pod functionality)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns-access
+  namespace: production
+  labels:
+    policy-type: dns-access
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  # Allow DNS queries to kube-system namespace
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  # Allow DNS queries to system DNS
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+```
+
+---
+
+## Example 2: Microservices Communication Pattern
+
+```yaml
+# Web tier network policy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: web-tier-policy
+  namespace: production
+  labels:
+    tier: web
+    policy-type: microservices
+spec:
+  podSelector:
+    matchLabels:
+      tier: web
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow traffic from ingress controllers
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 8080
+  # Allow traffic from load balancers
+  - from:
+    - podSelector:
+        matchLabels:
+          app: nginx-ingress
+    ports:
+    - protocol: TCP
+      port: 8080
+  egress:
+  # Allow communication to API tier
+  - to:
+    - podSelector:
+        matchLabels:
+          tier: api
+    ports:
+    - protocol: TCP
+      port: 3000
+  # Allow external HTTPS calls
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+---
+# API tier network policy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api-tier-policy
+  namespace: production
+  labels:
+    tier: api
+    policy-type: microservices
+spec:
+  podSelector:
+    matchLabels:
+      tier: api
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow traffic from web tier
+  - from:
+    - podSelector:
+        matchLabels:
+          tier: web
+    ports:
+    - protocol: TCP
+      port: 3000
+  # Allow traffic from same tier (service mesh)
+  - from:
+    - podSelector:
+        matchLabels:
+          tier: api
+    ports:
+    - protocol: TCP
+      port: 3000
+  egress:
+  # Allow communication to database tier
+  - to:
+    - podSelector:
+        matchLabels:
+          tier: database
+    ports:
+    - protocol: TCP
+      port: 5432
+  # Allow communication to cache tier
+  - to:
+    - podSelector:
+        matchLabels:
+          tier: cache
+    ports:
+    - protocol: TCP
+      port: 6379
+---
+# Database tier network policy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: database-tier-policy
+  namespace: production
+  labels:
+    tier: database
+    policy-type: microservices
+spec:
+  podSelector:
+    matchLabels:
+      tier: database
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Only allow traffic from API tier
+  - from:
+    - podSelector:
+        matchLabels:
+          tier: api
+    ports:
+    - protocol: TCP
+      port: 5432
+  # Allow backup and monitoring access
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 5432
+  egress:
+  # Minimal egress - only DNS and backup storage
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443  # For backup to cloud storage
+```
+
+---
+
+## Example 3: Multi-Namespace Communication
+
+```yaml
+# Production namespace label
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: production
+  labels:
+    name: production
+    environment: prod
+    network-policy: enabled
+---
+# Development namespace label
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: development
+  labels:
+    name: development
+    environment: dev
+    network-policy: enabled
+---
+# Cross-namespace API access policy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cross-namespace-api-access
+  namespace: production
+  labels:
+    policy-type: cross-namespace
+spec:
+  podSelector:
+    matchLabels:
+      app: shared-api
+  policyTypes:
+  - Ingress
+  ingress:
+  # Allow access from development namespace
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: development
+    - podSelector:
+        matchLabels:
+          role: api-client
+    ports:
+    - protocol: TCP
+      port: 8080
+  # Allow access from monitoring namespace
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 8080
+    - protocol: TCP
+      port: 9090  # metrics endpoint
+---
+# Monitoring namespace access policy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: monitoring-access-policy
+  namespace: monitoring
+  labels:
+    policy-type: observability
+spec:
+  podSelector:
+    matchLabels:
+      app: prometheus
+  policyTypes:
+  - Egress
+  egress:
+  # Allow scraping metrics from all namespaces
+  - to:
+    - namespaceSelector: {}
+    ports:
+    - protocol: TCP
+      port: 8080
+    - protocol: TCP
+      port: 9090
+    - protocol: TCP
+      port: 9100
+  # Allow access to Kubernetes API
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 6443
+```
+
+---
+
+## Example 4: Service Mesh Integration (Istio)
+
+```yaml
+# Istio sidecar communication policy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: istio-sidecar-policy
+  namespace: production
+  labels:
+    policy-type: service-mesh
+    mesh: istio
+spec:
+  podSelector:
+    matchLabels:
+      security.istio.io/tlsMode: istio
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow Istio control plane communication
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: istio-system
+    ports:
+    - protocol: TCP
+      port: 15090  # Envoy admin
+    - protocol: TCP
+      port: 15021  # Health checks
+  # Allow inbound traffic through Envoy proxy
+  - from:
+    - podSelector: {}
+    ports:
+    - protocol: TCP
+      port: 15006  # Envoy inbound
+  egress:
+  # Allow Istio control plane communication
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: istio-system
+    ports:
+    - protocol: TCP
+      port: 15010  # Pilot discovery
+    - protocol: TCP
+      port: 15011  # Pilot XDS
+  # Allow outbound traffic through Envoy proxy
+  - to:
+    - podSelector: {}
+    ports:
+    - protocol: TCP
+      port: 15001  # Envoy outbound
+---
+# Allow Istio control plane access
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: istio-control-plane-policy
+  namespace: istio-system
+  labels:
+    policy-type: control-plane
+    mesh: istio
+spec:
+  podSelector:
+    matchLabels:
+      app: istiod
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow communication from mesh workloads
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          istio-injection: enabled
+    ports:
+    - protocol: TCP
+      port: 15010
+    - protocol: TCP
+      port: 15011
+    - protocol: TCP
+      port: 443
+  egress:
+  # Allow access to Kubernetes API
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 6443
+```
+
+---
+
+## Example 5: PCI DSS Compliance Pattern
+
+```yaml
+# PCI DSS compliant network isolation
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: pci-dss-cardholder-data
+  namespace: payment-processing
+  labels:
+    compliance: pci-dss
+    data-classification: cardholder-data
+spec:
+  podSelector:
+    matchLabels:
+      data-classification: cardholder-data
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Only allow access from authenticated payment services
+  - from:
+    - podSelector:
+        matchLabels:
+          role: payment-processor
+          authenticated: "true"
+    ports:
+    - protocol: TCP
+      port: 8443  # HTTPS only
+  # Allow monitoring from security namespace
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: security-monitoring
+    - podSelector:
+        matchLabels:
+          role: security-scanner
+    ports:
+    - protocol: TCP
+      port: 9090  # Metrics endpoint
+  egress:
+  # Allow communication to payment gateway (external)
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+  # Allow secure database access
+  - to:
+    - podSelector:
+        matchLabels:
+          database-type: encrypted
+          compliance: pci-dss
+    ports:
+    - protocol: TCP
+      port: 5432
+  # Explicit DNS resolution
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: UDP
+      port: 53
+---
+# PCI DSS audit logging policy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: pci-dss-audit-logging
+  namespace: payment-processing
+  labels:
+    compliance: pci-dss
+    function: audit-logging
+spec:
+  podSelector:
+    matchLabels:
+      function: audit-logger
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow log data from all PCI-related pods
+  - from:
+    - podSelector:
+        matchLabels:
+          compliance: pci-dss
+    ports:
+    - protocol: TCP
+      port: 514   # Syslog
+    - protocol: UDP
+      port: 514   # Syslog UDP
+  egress:
+  # Allow secure log forwarding to SIEM
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 6514  # Secure syslog
+  # Allow backup to secure storage
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+```
+
+---
+
+## Testing Network Policies
+
+```bash
+# Check if network policies are applied
+kubectl get networkpolicy -A
+
+# Describe specific policy
+kubectl describe networkpolicy default-deny-all -n production
+
+# Test connectivity between pods
+kubectl run test-pod --image=busybox --rm -it -- sh
+# Inside pod:
+# wget -O- --timeout=2 http://target-service.namespace.svc.cluster.local:8080
+
+# Test cross-namespace connectivity
+kubectl run test-client -n development --image=curlimages/curl --rm -it -- sh
+# Inside pod:
+# curl -m 5 http://shared-api.production.svc.cluster.local:8080
+
+# Monitor network policy enforcement (requires CNI support)
+kubectl logs -n kube-system -l app=calico-node --tail=100 | grep -i "denied"
+
+# Check pod labels for policy matching
+kubectl get pods --show-labels -n production
+```
+
+---
+
+## CNI Plugin Compatibility
+
+### Calico
+- ✅ **Full Support**: All NetworkPolicy features
+- ✅ **Advanced Features**: GlobalNetworkPolicy, HostEndpoint
+- ✅ **Performance**: High-performance eBPF dataplane
+
+### Cilium
+- ✅ **Full Support**: All NetworkPolicy features + Layer 7 policies
+- ✅ **Advanced Features**: CiliumNetworkPolicy with HTTP/gRPC rules
+- ✅ **Observability**: Built-in network visibility with Hubble
+
+### Flannel
+- ❌ **No Support**: Does not implement NetworkPolicy
+- 💡 **Solution**: Use Flannel with Calico for policy enforcement
+
+### Weave Net
+- ✅ **Basic Support**: Standard NetworkPolicy features
+- ⚠️ **Limitations**: Limited advanced features
+
+---
+
+## Troubleshooting Network Policies
+
+### Common Issues
+
+```bash
+# 1. Check if CNI supports NetworkPolicy
+kubectl get nodes -o jsonpath='{.items[*].status.nodeInfo.containerRuntimeVersion}'
+
+# 2. Verify pod labels match policy selectors
+kubectl get pod <pod-name> -o jsonpath='{.metadata.labels}'
+
+# 3. Check namespace labels
+kubectl get namespace <namespace-name> -o jsonpath='{.metadata.labels}'
+
+# 4. Test DNS resolution (often blocked by aggressive policies)
+kubectl exec -it <pod-name> -- nslookup kubernetes.default.svc.cluster.local
+
+# 5. Check policy order and conflicts
+kubectl get networkpolicy -A -o yaml | grep -A 10 -B 5 "podSelector"
+```
+
+### Debug Commands
+
+```bash
+# Enable network policy logging (Calico)
+kubectl patch felixconfiguration default --type merge --patch '{"spec":{"logSeverityScreen":"Debug"}}'
+
+# Check policy status (Cilium)
+kubectl exec -n kube-system cilium-xxx -- cilium policy get
+
+# Monitor traffic (if supported by CNI)
+kubectl exec -n kube-system calico-node-xxx -- calico-node -bpf policy dump
+```
+
+---
+
+## Production Considerations
+
+### Security Best Practices
+1. **Default Deny**: Always start with deny-all policies
+2. **Least Privilege**: Grant minimal required access
+3. **Namespace Isolation**: Use namespace selectors for multi-tenancy
+4. **Regular Audits**: Review and update policies regularly
+
+### Performance Considerations
+1. **Policy Complexity**: Simple policies perform better
+2. **Label Optimization**: Use efficient label selectors
+3. **CNI Selection**: Choose appropriate CNI for scale requirements
+4. **Monitoring**: Track policy enforcement overhead
+
+### Compliance Requirements
+1. **PCI DSS**: Implement network segmentation for cardholder data
+2. **HIPAA**: Isolate PHI processing systems
+3. **SOC 2**: Document and audit network access controls
+4. **GDPR**: Segment personal data processing environments
+
+## Architecture Integration
+
+These Network Policy examples implement the **Container Network Interface (CNI)** architecture as detailed in the [main architecture guide](../kubernetes-architecture-deep-dive.md#networking-architecture-deep-dive). They demonstrate:
+
+- **Defense in Depth**: Network-level security complementing RBAC
+- **Microsegmentation**: Fine-grained traffic control between pods
+- **CNI Plugin Integration**: How different CNI implementations handle policies
+- **Service Mesh Compatibility**: Integration with Istio and other mesh solutions
+
+## CKAD Exam Tips
+
+1. **Understand Policy Types**: Know the difference between Ingress and Egress policies
+2. **Master Selectors**: Practice with podSelector, namespaceSelector combinations
+3. **Default Behavior**: Remember that no NetworkPolicy = allow all traffic
+4. **DNS Requirements**: Always allow DNS resolution in production policies
+5. **Testing**: Practice testing connectivity with kubectl exec and curl/wget
